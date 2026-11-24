@@ -24,8 +24,4 @@ services:
     volumes:
       - ./scripts/init.d/demo-mode:/unifi/init.d/demo-mode:Z
     ports:
-      - 8443:8443
-      - 3478:3478/udp
-      - 10001:10001/udp
-      - 8080:8080
-    restart: unless-stopped
+      - "127.0.0.1:8443:8443"

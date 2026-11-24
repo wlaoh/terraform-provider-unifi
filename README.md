@@ -12,9 +12,9 @@ You can browse documentation on the [Terraform provider registry](https://regist
 
 ## Supported Unifi Controller Versions
 
-As of version [v0.34](https://github.com/ubiquiti-community/terraform-provider-unifi/releases/tag/v0.34.0), this provider only supports version 6 of the Unifi controller software. If you need v5 support, you can pin an older version of the provider.
+Controller compatibility varies by feature and firmware. The acceptance workflow exercises the current controller container. Hardware-specific settings and Integration API resources also depend on the console model, firmware and authentication method. Use the resource documentation for prerequisites.
 
-The docker, UDM, and UDM-Pro versions are slightly different (the API is proxied a little differently) but for the most part should all be supported. Individual patch versions of the controller are generally not tested for compatibility, just the latest stable versions.
+For an existing site, import one object first and run a normal plan to verify it has no pending changes. Terraform 1.14 or later also supports discovery with the provider's list resources.
 
 ## Using the Provider
 

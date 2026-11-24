@@ -143,9 +143,10 @@ jobs:
   # ── Full issue triage sweep ──────────────────────────────────────────────
   triage:
     if: >-
-      github.event_name == 'push' ||
+      github.repository == 'ubiquiti-community/terraform-provider-unifi' &&
+      (github.event_name == 'push' ||
       (github.event_name == 'schedule' && github.event.schedule == '0 9 * * 1') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.task == 'triage' || github.event.inputs.task == 'all'))
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.task == 'triage' || github.event.inputs.task == 'all')))
     runs-on: ubuntu-latest
     concurrency:
       group: issue-triage
@@ -397,7 +398,7 @@ jobs:
               'The `unifi_account` resource (v0.41.19) correctly maps `network_id` ↔ `networkconf_id`. ' +
               'The UI VLAN not being set may be a UniFi controller behaviour issue ' +
               '(may require additional RADIUS tunnel fields: `tunnel_type`, `tunnel_medium_type`). ' +
-              'Please share your Network Application version and raw `/rest/account/<id>` API response.');
+              'Please share your Network Application version and whether `networkconf_id` is present, plus its JSON type. Omit account values and credentials.');
             await addLabels(67, ['question']);
 
             // ── Auto-label any remaining open issues with no labels ───────

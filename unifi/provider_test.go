@@ -91,6 +91,17 @@ func runAcceptanceTests(m *testing.M) int {
 		panic(err)
 	}
 
+	defer func() {
+		logger.Printf("RUNNING TEAR DOWN")
+		if err := dc.Down(
+			context.Background(),
+			compose.RemoveOrphans(true),
+			compose.RemoveImagesLocal,
+		); err != nil {
+			panic(err)
+		}
+	}()
+
 	// Don't wait for health check in compose.Up - we'll do our own waiting with waitForUniFiAPI
 	// The health check has a 90s start_period which can cause timeouts in testcontainers
 	if err = dc.WithOsEnv().
@@ -144,17 +155,6 @@ func runAcceptanceTests(m *testing.M) int {
 	if err = os.Setenv("UNIFI_API_KEY", ""); err != nil {
 		panic(err)
 	}
-
-	defer func() {
-		logger.Printf("RUNNING TEAR DOWN")
-		if err := dc.Down(
-			context.Background(),
-			compose.RemoveOrphans(true),
-			compose.RemoveImagesLocal,
-		); err != nil {
-			panic(err)
-		}
-	}()
 
 	if err := waitForUniFiAPI(ctx, logger, endpoint, user, password); err != nil {
 		panic(err)

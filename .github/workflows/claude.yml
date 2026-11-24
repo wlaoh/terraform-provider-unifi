@@ -23,7 +23,7 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
-      actions: write # Required for Claude to read CI results on PRs
+      actions: read # Required for Claude to read CI results on PRs
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -41,6 +41,6 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           additional_permissions: |
-            actions: write
+            actions: read
           claude_args: >-
             --allowed-tools "Bash(gofmt:*),Bash(go fmt:*),Bash(go install:*),Bash(golangci-lint:*),Bash(gh *),Bash(git fetch:*),Bash(git merge:*),Bash(git rebase:*),Bash(git checkout:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git add:*),Bash(git commit:*),Bash(git show:*),Bash(gh pr:*),Bash(go build:*),Bash(go vet:*),Bash(go test:*)"
