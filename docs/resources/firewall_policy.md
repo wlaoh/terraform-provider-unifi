@@ -2,12 +2,12 @@
 page_title: Firewall Policy (Resource)
 subcategory: ""
 description: |-
-  Manages a UniFi zone-based firewall policy (UniFi Network 8.x+). Zone-based firewall policies replace the legacy firewall rules and are displayed under Settings → Security → Firewall Policies in the UniFi UI.
+  Manages a UniFi zone-based firewall policy (UniFi Network 8.x+). Zone-based firewall policies replace the legacy firewall rules and are displayed under Settings → Security → Firewall Policies in the UniFi UI. Predefined policies support import and refresh. Updates and deletions require the controller to identify the policy as user-defined.
 ---
 
 # Firewall Policy (Resource)
 
-Manages a UniFi zone-based firewall policy (UniFi Network 8.x+). Zone-based firewall policies replace the legacy firewall rules and are displayed under Settings → Security → Firewall Policies in the UniFi UI.
+Manages a UniFi zone-based firewall policy (UniFi Network 8.x+). Zone-based firewall policies replace the legacy firewall rules and are displayed under Settings → Security → Firewall Policies in the UniFi UI. Predefined policies support import and refresh. Updates and deletions require the controller to identify the policy as user-defined.
 
 ## Example Usage
 

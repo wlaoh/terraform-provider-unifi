@@ -620,7 +620,9 @@ func (r *firewallPolicyResource) Schema(
 		Version: 2,
 		MarkdownDescription: "Manages a UniFi zone-based firewall policy (UniFi Network 8.x+). " +
 			"Zone-based firewall policies replace the legacy firewall rules and are displayed " +
-			"under Settings → Security → Firewall Policies in the UniFi UI.",
+			"under Settings → Security → Firewall Policies in the UniFi UI. " +
+			"Predefined policies support import and refresh. Updates and deletions require " +
+			"the controller to identify the policy as user-defined.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -1096,6 +1098,10 @@ func (r *firewallPolicyResource) Update(
 	plannedSrcMTT := endpointMatchingTargetType(ctx, plan.Source, &resp.Diagnostics)
 	plannedDstMTT := endpointMatchingTargetType(ctx, plan.Destination, &resp.Diagnostics)
 
+	if err := r.client.RequireCustomFirewallPolicy(ctx, site, fp.ID); err != nil {
+		resp.Diagnostics.AddError("Cannot Update Firewall Policy", err.Error())
+		return
+	}
 	updated, err := r.client.UpdateFirewallPolicy(ctx, site, fp)
 	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
@@ -1168,7 +1174,16 @@ func (r *firewallPolicyResource) Delete(
 		site = r.client.Site
 	}
 
-	err := r.client.DeleteFirewallPolicy(ctx, site, state.ID.ValueString())
+	id := state.ID.ValueString()
+	if err := r.client.RequireCustomFirewallPolicy(ctx, site, id); err != nil {
+		// Only an ID missing from a successfully read collection confirms absence.
+		// A failed collection read, including HTTP 404, is a verification error.
+		if _, absent := err.(*unifi.NotFoundError); !absent {
+			resp.Diagnostics.AddError("Cannot Delete Firewall Policy", err.Error())
+		}
+		return
+	}
+	err := r.client.DeleteFirewallPolicy(ctx, site, id)
 	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
 		if _, ok := err.(*unifi.NotFoundError); !ok {
