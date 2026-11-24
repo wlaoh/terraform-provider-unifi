@@ -1,0 +1,2 @@
+# Import a user-defined IPv4 Echo Request policy by Integration API site and policy UUID.
+terraform import unifi_icmp_firewall_policy.gateway_ping 11111111-1111-4111-8111-111111111111/55555555-5555-4555-8555-555555555555
