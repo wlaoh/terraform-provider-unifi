@@ -230,6 +230,7 @@ resource "unifi_setting" "etherlighting" {
 - `site` (String) The name of the site to associate the settings with.
 - `snmp` (Attributes) SNMP agent settings (Settings > System > SNMP): a v1/v2c community and a single SNMPv3 user. Only configured SNMP settings are read; import does not populate this attribute. (see [below for nested schema](#nestedatt--snmp))
 - `syslog` (Attributes) Remote syslog (rsyslogd) settings. (see [below for nested schema](#nestedatt--syslog))
+- `teleport` (Attributes) Teleport remote-access VPN settings for this site. (see [below for nested schema](#nestedatt--teleport))
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `usg` (Attributes) USG settings. (see [below for nested schema](#nestedatt--usg))
 
@@ -623,6 +624,15 @@ Optional:
 
 - `enabled` (Boolean) Also log this controller's events.
 - `encrypted_only` (Boolean) Only send this controller's logs over an encrypted channel.
+
+
+
+<a id="nestedatt--teleport"></a>
+### Nested Schema for `teleport`
+
+Required:
+
+- `enabled` (Boolean) Enable Teleport remote-access VPN.
 
 
 

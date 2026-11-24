@@ -28,6 +28,7 @@ import (
 // documents: a section whose document is absent must import as null. dpi and
 // rsyslogd hold values other than the provider's leaf defaults.
 var fakeSettingDocuments = map[string]string{
+	"teleport": `{"key":"teleport","enabled":true}`,
 	"mdns": `{"key":"mdns","mode":"custom","enabled_for":"some","enabled_for_network_ids":["lan-a"],
 		"predefined_services":[{"code":"printers"}]}`,
 	"radio_ai": `{"key":"radio_ai","enabled":true,"auto_enabled":false,"channels_ng":["1","6"],
@@ -395,6 +396,7 @@ func TestSettingImportReadsEverySection(t *testing.T) {
 		t.Fatalf("ntp: %v", d)
 	}
 	onlyNtp := plan
+	onlyNtp.Teleport = types.ObjectNull(teleportAttrTypes)
 	onlyNtp.AutoSpeedtest = types.ObjectNull(autoSpeedtestAttrTypes)
 	onlyNtp.Country = types.ObjectNull(countryAttrTypes)
 	onlyNtp.Dpi = types.ObjectNull(dpiAttrTypes)

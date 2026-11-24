@@ -306,6 +306,7 @@ type settingResourceModel struct {
 	AutoSpeedtest types.Object   `tfsdk:"auto_speedtest"`
 	Country       types.Object   `tfsdk:"country"`
 	Dpi           types.Object   `tfsdk:"dpi"`
+	Teleport      types.Object   `tfsdk:"teleport"`
 	Lcm           types.Object   `tfsdk:"lcm"`
 	NetworkOpt    types.Object   `tfsdk:"network_optimization"`
 	Ntp           types.Object   `tfsdk:"ntp"`
@@ -805,6 +806,7 @@ func (r *settingResource) Schema(
 					},
 				},
 			},
+			"teleport": teleportSchemaAttribute(),
 			"dpi": schema.SingleNestedAttribute{
 				MarkdownDescription: "Deep Packet Inspection (DPI) settings.",
 				Optional:            true,
@@ -2934,6 +2936,8 @@ func (r *settingResource) Create(
 		}
 	}
 
+	r.persistTeleport(ctx, site, req.Config, &resp.Diagnostics)
+
 	var globalSwitchConfig types.Object
 	resp.Diagnostics.Append(
 		req.Config.GetAttribute(ctx, path.Root("global_switch"), &globalSwitchConfig)...)
@@ -3369,6 +3373,10 @@ func (r *settingResource) Update(
 		}
 	}
 
+	if settingSectionChanged(plan.Teleport, state.Teleport) {
+		r.persistTeleport(ctx, site, req.Config, &resp.Diagnostics)
+	}
+
 	if settingSectionChanged(plan.GlobalSwitch, state.GlobalSwitch) {
 		var globalSwitchConfig types.Object
 		resp.Diagnostics.Append(
@@ -3508,6 +3516,7 @@ func (r *settingResource) readImportedSettings(
 		{&data.AutoSpeedtest, (*settings.AutoSpeedtest)(nil), autoSpeedtestAttrTypes},
 		{&data.Country, (*settings.Country)(nil), countryAttrTypes},
 		{&data.Dpi, (*settings.Dpi)(nil), dpiAttrTypes},
+		{&data.Teleport, (*settings.Teleport)(nil), teleportAttrTypes},
 		{&data.Lcm, (*settings.Lcm)(nil), lcmAttrTypes},
 		{&data.NetworkOpt, (*settings.NetworkOptimization)(nil), networkOptimizationAttrTypes},
 		{&data.Ntp, (*settings.Ntp)(nil), ntpAttrTypes},
@@ -3635,6 +3644,11 @@ func (r *settingResource) readSettings(
 	data.Site = types.StringValue(site)
 
 	// Only read settings that were configured in the plan, set others to null
+
+	r.readTeleport(ctx, site, data, diags)
+	if diags.HasError() {
+		return
+	}
 
 	// Auto speedtest settings
 	if !data.AutoSpeedtest.IsNull() && !data.AutoSpeedtest.IsUnknown() {
