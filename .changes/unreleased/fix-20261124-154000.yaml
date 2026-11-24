@@ -1,0 +1,3 @@
+kind: fix
+body: 'Protect credentials in controller connections, diagnostics, and state. Reject imports and mutations of the wrong controller network type. WireGuard client files with unsupported AllowedIPs now return a diagnostic before apply.'
+time: 2026-11-24T15:40:00Z

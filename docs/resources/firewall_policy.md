@@ -229,6 +229,7 @@ resource "unifi_firewall_policy" "allow_https_ipv6_host" {
 - `create_allow_respond` (Boolean) When `true`, UniFi automatically creates a matching rule to allow established/related return traffic. Recommended for `ALLOW` policies. Taken from the controller when not set; a new policy is created with it off (#544).
 - `description` (String) A description for the policy. Taken from the controller when not set (#544).
 - `enabled` (Boolean) Whether the policy is enabled. Defaults to `true` for a newly created policy; an existing policy keeps whatever the controller holds, so adopting a policy disabled in the UI does not re-enable it (#544).
+- `icmp` (Attributes) ICMP type selectors as reported by the controller. Omit to preserve its current values. (see [below for nested schema](#nestedatt--icmp))
 - `ip_version` (String) The IP version to match: `BOTH`, `IPV4`, or `IPV6`. Defaults to `IPV4` for a newly created policy; an existing policy keeps whatever the controller holds, so adopting a dual-stack policy does not narrow it to IPv4 (#544). The controller requires this field, so it is always sent.
 - `logging` (Boolean) Whether to log packets matching this policy. Taken from the controller when not set; a new policy is created with logging off (#544).
 - `match_opposite_protocol` (Boolean) Invert the protocol match: when `true`, the policy matches every protocol **except** `protocol`. Corresponds to the "Match Opposite" toggle next to the protocol selector in the UniFi UI. Taken from the controller when not set; a new policy is created with it off (#544).
@@ -239,9 +240,8 @@ resource "unifi_firewall_policy" "allow_https_ipv6_host" {
 
 ### Read-Only
 
-- `icmp` (Attributes) ICMP type matching modes. Managed by the UniFi controller; the provider round-trips them so updates are accepted. (see [below for nested schema](#nestedatt--icmp))
 - `id` (String) The ID of the firewall policy.
-- `index` (Number) The ordering index of the policy within its zone-pair, assigned by the controller. **Read-only:** UniFi does not accept a client-supplied index on create or update (the policy is always appended to the end of its source/destination zone-pair), and the supported API exposes no reorder operation, so policy ordering cannot be managed through this provider. Reorder policies in the UniFi UI if needed.
+- `index` (Number) Read-only index within the zone pair. Manage policy ordering separately with `unifi_firewall_policy_ordering` and the Integration API UUIDs.
 
 <a id="nestedatt--destination"></a>
 ### Nested Schema for `destination`
@@ -307,6 +307,15 @@ Read-Only:
 - `matching_target_type` (String) How the matching target is specified (`ANY`, `SPECIFIC`, `LIST`, `OBJECT`). Managed by the UniFi controller; the provider round-trips it so updates are accepted.
 
 
+<a id="nestedatt--icmp"></a>
+### Nested Schema for `icmp`
+
+Optional:
+
+- `typename` (String) IPv4 ICMP type name for this controller. For an existing policy, inspect the imported value before recreating it.
+- `v6_typename` (String) IPv6 ICMP type name for this controller.
+
+
 <a id="nestedatt--schedule"></a>
 ### Nested Schema for `schedule`
 
@@ -348,15 +357,6 @@ Optional:
 - `delete` (String) A string that can be [parsed as a duration](https://pkg.go.dev/time#ParseDuration) consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Setting a timeout for a Delete operation is only applicable if changes are saved into state before the destroy operation occurs.
 - `read` (String) A string that can be [parsed as a duration](https://pkg.go.dev/time#ParseDuration) consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours). Read operations occur during any refresh or planning operation when refresh is enabled.
 - `update` (String) A string that can be [parsed as a duration](https://pkg.go.dev/time#ParseDuration) consisting of numbers and unit suffixes, such as "30s" or "2h45m". Valid time units are "s" (seconds), "m" (minutes), "h" (hours).
-
-
-<a id="nestedatt--icmp"></a>
-### Nested Schema for `icmp`
-
-Read-Only:
-
-- `typename` (String) ICMP type matching mode. Managed by the UniFi controller; the provider round-trips it so updates are accepted.
-- `v6_typename` (String) ICMPv6 type matching mode. Managed by the UniFi controller; the provider round-trips it so updates are accepted.
 
 ## Import
 

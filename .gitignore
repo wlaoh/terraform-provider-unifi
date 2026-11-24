@@ -73,3 +73,6 @@ __debug_bin*
 .github/.bak
 
 .test
+
+# Local binaries used with Terraform dev_overrides
+/.local-bin/
