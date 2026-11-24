@@ -38,6 +38,13 @@ provider_installation {
 
 Run `terraform providers schema -json` and look for `unifi_firewall_policy_ordering` to verify that Terraform loaded the fork. Terraform 1.11 or later is required for write-only arguments.
 
+### Adopting an existing firewall exception
+
+1. Use an Integration API key to read `GET /v1/sites` from the Network Integration API. Under `/v1/sites/{siteId}/`, list `networks`, `firewall/zones` and `firewall/policies`. Record the UUIDs for the source network, both zones and the policies. The legacy API uses different IDs.
+2. For a rule allowing IPv4 Echo Request from a specific network to its gateway address, configure and import [the ICMP policy](docs/resources/icmp_firewall_policy.md). A policy with additional match conditions needs a resource that can represent those conditions.
+3. Import [the ordering for that zone pair](docs/resources/firewall_policy_ordering.md) and inspect it with `terraform state show`. Set both ordering lists to match, including every existing user policy. Reference the imported ICMP resource's `.id` at the exception's current position.
+4. Run `terraform plan`. With the existing policy and its order fully captured, expect zero changes before editing the rule.
+
 ## Using the upstream release
 
 ### Terraform 1.0 and above

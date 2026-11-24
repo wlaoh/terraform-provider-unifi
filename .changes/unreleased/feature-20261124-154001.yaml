@@ -1,3 +1,3 @@
 kind: feature
-body: 'Manage zone-pair firewall policy order through the Integration API and configure the legacy zone policy ICMP matching fields.'
+body: 'Manage zone-pair firewall policy order and network-to-address IPv4 Echo Request policies through the Integration API. Configure the ICMP matching fields on legacy zone policies.'
 time: 2026-11-24T15:40:01Z

@@ -25,7 +25,8 @@ func TestICMPFirewallPolicyResourceLifecycle(t *testing.T) {
 		case "/proxy/network/status":
 			_, _ = io.WriteString(w, `{"meta":{"server_version":"10.0.0"}}`)
 			return
-		case "/proxy/network/integration/v1/sites/" + site + "/firewall/policies", "/proxy/network/integration/v1/sites/" + site + "/firewall/policies/" + id:
+		case "/proxy/network/integration/v1/sites/" + site + "/firewall/policies",
+			"/proxy/network/integration/v1/sites/" + site + "/firewall/policies/" + id:
 		default:
 			t.Errorf("unexpected request %s", req.URL.Path)
 			http.NotFound(w, req)
@@ -39,7 +40,9 @@ func TestICMPFirewallPolicyResourceLifecycle(t *testing.T) {
 				return
 			}
 			current = next
-			current["id"], current["index"], current["metadata"] = id, 5, map[string]any{"origin": "USER_DEFINED"}
+			current["id"], current["index"], current["metadata"] = id, 5, map[string]any{
+				"origin": "USER_DEFINED",
+			}
 		case http.MethodDelete:
 			current = nil
 			return
@@ -61,8 +64,15 @@ func TestICMPFirewallPolicyResourceLifecycle(t *testing.T) {
 	r := &icmpFirewallPolicyResource{client: &Client{ApiClient: client}}
 	var s resource.SchemaResponse
 	r.Schema(ctx, resource.SchemaRequest{}, &s)
-	empty := tfsdk.State{Schema: s.Schema, Raw: tftypes.NewValue(s.Schema.Type().TerraformType(ctx), nil)}
-	networks, d := types.SetValueFrom(ctx, types.StringType, []string{"30000000-0000-0000-0000-000000000001", "30000000-0000-0000-0000-000000000002"})
+	empty := tfsdk.State{
+		Schema: s.Schema,
+		Raw:    tftypes.NewValue(s.Schema.Type().TerraformType(ctx), nil),
+	}
+	networks, d := types.SetValueFrom(
+		ctx,
+		types.StringType,
+		[]string{"30000000-0000-0000-0000-000000000001", "30000000-0000-0000-0000-000000000002"},
+	)
 	if d.HasError() {
 		t.Fatal(d)
 	}
@@ -71,10 +81,22 @@ func TestICMPFirewallPolicyResourceLifecycle(t *testing.T) {
 		t.Fatal(d)
 	}
 	model := icmpFirewallPolicyModel{
-		ID: types.StringUnknown(), Site: types.StringValue(site), Name: types.StringValue("Allow ping"), Action: types.StringValue("ALLOW"),
-		Enabled: types.BoolValue(true), Description: types.StringValue("Gateway ICMP"), AllowReturnTraffic: types.BoolValue(true), LoggingEnabled: types.BoolValue(false),
-		SourceZone: types.StringValue("20000000-0000-0000-0000-000000000001"), DestinationZone: types.StringValue("20000000-0000-0000-0000-000000000002"),
-		SourceNetworks: networks, DestinationAddresses: addresses,
+		ID:     types.StringUnknown(),
+		Site:   types.StringValue(site),
+		Name:   types.StringValue("Allow ping"),
+		Action: types.StringValue("ALLOW"),
+		Enabled: types.BoolValue(
+			true,
+		),
+		Description:        types.StringValue("Gateway ICMP"),
+		AllowReturnTraffic: types.BoolValue(true),
+		LoggingEnabled:     types.BoolValue(false),
+		SourceZone: types.StringValue(
+			"20000000-0000-0000-0000-000000000001",
+		),
+		DestinationZone:      types.StringValue("20000000-0000-0000-0000-000000000002"),
+		SourceNetworks:       networks,
+		DestinationAddresses: addresses,
 	}
 	plan := tfsdk.Plan{Schema: s.Schema}
 	if d := plan.Set(ctx, &model); d.HasError() {
@@ -101,10 +123,18 @@ func TestICMPFirewallPolicyResourceLifecycle(t *testing.T) {
 	if d := read.State.Get(ctx, &model); d.HasError() {
 		t.Fatal(d)
 	}
-	if !model.ID.Equal(types.StringValue(id)) || !model.SourceNetworks.Equal(networks) || !model.DestinationAddresses.Equal(addresses) || !model.AllowReturnTraffic.ValueBool() {
+	if !model.ID.Equal(types.StringValue(id)) || !model.SourceNetworks.Equal(networks) ||
+		!model.DestinationAddresses.Equal(addresses) ||
+		!model.AllowReturnTraffic.ValueBool() {
 		t.Fatalf("unexpected imported model %+v", model)
 	}
-	model.Action, model.AllowReturnTraffic, model.Enabled = types.StringValue("BLOCK"), types.BoolValue(false), types.BoolValue(false)
+	model.Action, model.AllowReturnTraffic, model.Enabled = types.StringValue(
+		"BLOCK",
+	), types.BoolValue(
+		false,
+	), types.BoolValue(
+		false,
+	)
 	if d := plan.Set(ctx, &model); d.HasError() {
 		t.Fatal(d)
 	}
