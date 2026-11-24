@@ -28,7 +28,12 @@ import (
 // documents: a section whose document is absent must import as null. dpi and
 // rsyslogd hold values other than the provider's leaf defaults.
 var fakeSettingDocuments = map[string]string{
-	"dpi": `{"key":"dpi","enabled":true,"fingerprintingEnabled":true}`,
+	"mdns": `{"key":"mdns","mode":"custom","enabled_for":"some","enabled_for_network_ids":["lan-a"],
+		"predefined_services":[{"code":"printers"}]}`,
+	"radio_ai": `{"key":"radio_ai","enabled":true,"auto_enabled":false,"channels_ng":["1","6"],
+		"radios":["ng"],"optimize":["channel"]}`,
+	"ether_lighting": `{"key":"ether_lighting","speed_overrides":[{"key":"GbE","raw_color_hex":"ff0011"}]}`,
+	"dpi":            `{"key":"dpi","enabled":true,"fingerprintingEnabled":true}`,
 	"rsyslogd": `{"key":"rsyslogd","enabled":true,"debug":true,"ip":"192.0.2.14","port":514,
 		"log_all_contents":true,"netconsole_enabled":false,"netconsole_host":"192.0.2.15",
 		"netconsole_port":6666,"this_controller":true,
@@ -187,12 +192,15 @@ func TestSettingImportReadsEverySection(t *testing.T) {
 		"mgmt":          imported.Mgmt,
 		"igmp_snooping": imported.IgmpSnooping,
 		"global_switch": imported.GlobalSwitch,
+		"mdns":          imported.Mdns,
+		"radio_ai":      imported.RadioAi,
+		"etherlighting": imported.EtherLighting,
 		"usg":           imported.USG,
 		"dpi":           imported.Dpi,
 		"syslog":        imported.Syslog,
 	} {
 		if section.IsNull() || section.IsUnknown() {
-			t.Errorf("%s imported as %v, want the controller's document", name, section)
+			t.Fatalf("%s imported as %v, want the controller's document", name, section)
 		}
 	}
 	for name, section := range map[string]types.Object{
@@ -203,6 +211,23 @@ func TestSettingImportReadsEverySection(t *testing.T) {
 		if !section.IsNull() {
 			t.Errorf("%s imported as %v, want null: the controller has no document", name, section)
 		}
+	}
+	if got := imported.Mdns.Attributes()["mode"]; !types.StringValue("custom").Equal(got) {
+		t.Errorf("mdns.mode = %v, want custom", got)
+	}
+	if got := imported.RadioAi.Attributes()["channels_ng"]; !types.ListValueMust(
+		types.Int64Type, []attr.Value{types.Int64Value(1), types.Int64Value(6)},
+	).Equal(got) {
+		t.Errorf("radio_ai.channels_ng = %v, want [1, 6]", got)
+	}
+	var speedOverrides []settingEtherLightingSpeedOverrideModel
+	if d := imported.EtherLighting.Attributes()["speed_overrides"].(types.List).ElementsAs(
+		ctx, &speedOverrides, false,
+	); d.HasError() {
+		t.Fatal(d)
+	}
+	if len(speedOverrides) != 1 || speedOverrides[0].Color.ValueString() != "ff0011" {
+		t.Errorf("etherlighting.speed_overrides = %v, want the controller's speed color", speedOverrides)
 	}
 	if !imported.Mgmt.IsNull() {
 		var mgmt settingMgmtModel
@@ -384,6 +409,9 @@ func TestSettingImportReadsEverySection(t *testing.T) {
 	onlyNtp.IgmpSnooping = types.ObjectNull(igmpSnoopingAttrTypes)
 	onlyNtp.Connectivity = types.ObjectNull(connectivityAttrTypes)
 	onlyNtp.GlobalSwitch = types.ObjectNull(globalSwitchAttrTypes)
+	onlyNtp.Mdns = types.ObjectNull(mdnsAttrTypes)
+	onlyNtp.RadioAi = types.ObjectNull(radioAiAttrTypes)
+	onlyNtp.EtherLighting = types.ObjectNull(etherLightingAttrTypes)
 
 	planState := tfsdk.Plan{Schema: s}
 	if d := planState.Set(ctx, &plan); d.HasError() {

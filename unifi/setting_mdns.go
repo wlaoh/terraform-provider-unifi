@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -57,7 +58,9 @@ func mdnsSchemaAttribute() schema.Attribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Multicast DNS (Settings > Networks > Multicast DNS): which networks mDNS is " +
 			"reflected between, and which services. Options not exposed by this block are preserved across updates.",
-		Optional: true,
+		Optional:      true,
+		Computed:      true,
+		PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 		Attributes: map[string]schema.Attribute{
 			"mode": schema.StringAttribute{
 				MarkdownDescription: "Which services are reflected: `all`, `auto`, or `custom` " +

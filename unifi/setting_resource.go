@@ -1886,7 +1886,9 @@ func (r *settingResource) Schema(
 					"band out of `radios` is how its channel is pinned while the " +
 					"others stay optimized. Only the attributes set in config are " +
 					"written; the others keep their controller values.",
-				Optional: true,
+				Optional:      true,
+				Computed:      true,
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"enabled": schema.BoolAttribute{
 						MarkdownDescription: "The controller's `enabled` flag for " +
@@ -2135,7 +2137,9 @@ func (r *settingResource) Schema(
 					"per switch with `unifi_device`'s `etherlighting` block. Each list " +
 					"replaces the controller's list when set and is left untouched when " +
 					"omitted.",
-				Optional: true,
+				Optional:      true,
+				Computed:      true,
+				PlanModifiers: []planmodifier.Object{objectplanmodifier.UseStateForUnknown()},
 				Attributes: map[string]schema.Attribute{
 					"network_overrides": schema.ListNestedAttribute{
 						MarkdownDescription: "Colors for ports on the given network.",
@@ -3515,6 +3519,9 @@ func (r *settingResource) readImportedSettings(
 		{&data.USG, (*settings.Usg)(nil), usgAttrTypes},
 		{&data.IgmpSnooping, (*settings.IgmpSnooping)(nil), igmpSnoopingAttrTypes},
 		{&data.Connectivity, (*settings.Connectivity)(nil), connectivityAttrTypes},
+		{&data.Mdns, (*settings.Mdns)(nil), mdnsAttrTypes},
+		{&data.RadioAi, (*settings.RadioAi)(nil), radioAiAttrTypes},
+		{&data.EtherLighting, (*settings.EtherLighting)(nil), etherLightingAttrTypes},
 		{&data.GlobalSwitch, (*settings.GlobalSwitch)(nil), globalSwitchAttrTypes},
 	} {
 		key, err := settings.GetSettingKey(section.setting)
