@@ -77,6 +77,7 @@ type Config struct {
 // For direct connection, provide BaseURL and either APIKey or Username/Password.
 func New(ctx context.Context, cfg *Config) (*ApiClient, error) {
 	c := retryablehttp.NewClient()
+	c.HTTPClient.CheckRedirect = checkControllerRedirect
 	timeoutSeconds := 30
 	if cfg.TimeoutSeconds != nil {
 		timeoutSeconds = *cfg.TimeoutSeconds
@@ -127,7 +128,7 @@ func New(ctx context.Context, cfg *Config) (*ApiClient, error) {
 		return nil, err
 	}
 
-	if cfg.AllowInsecure {
+	if cfg.AllowInsecure && !cfg.CloudConnector {
 		transport := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
 			DialContext: (&net.Dialer{
@@ -149,6 +150,7 @@ func New(ctx context.Context, cfg *Config) (*ApiClient, error) {
 	}
 
 	if cfg.CloudConnector {
+		client.baseURL, _ = url.Parse("https://api.ui.com")
 		var err error
 		if cfg.HardwareID != "" {
 			_, err = client.enableCloudConnectorByHardwareID(ctx, cfg.HardwareID)
@@ -277,17 +279,48 @@ func csrfFromJWTCookie(cookies []*http.Cookie) (string, time.Time) {
 }
 
 func (c *ApiClient) setBaseURL(base string) error {
-	var err error
-	c.baseURL, err = url.Parse(base)
-	if err != nil {
-		return err
+	u, err := url.Parse(base)
+	if err != nil || u.Hostname() == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+		return errors.New("expected a controller URL with a hostname and without embedded credentials, query parameters or fragment")
 	}
+	local := strings.EqualFold(u.Hostname(), "localhost") || net.ParseIP(u.Hostname()).IsLoopback()
+	if u.Scheme != "https" && !(local && u.Scheme == "http") {
+		return errors.New("remote controller URLs require HTTPS; HTTP is supported only on loopback")
+	}
+	c.baseURL = u
 
 	// error for people who are still passing hard coded old paths
 	if path := strings.TrimSuffix(c.baseURL.Path, "/"); path == "/api" {
 		return fmt.Errorf("expected a base URL without the `/api`, got: %q", c.baseURL)
 	}
 
+	return nil
+}
+
+// sameControllerOrigin includes scheme and effective port. Credentials and login
+// request bodies may only travel to the origin selected in the configuration.
+func sameControllerOrigin(origin, target *url.URL) bool {
+	return target.User == nil && origin.Scheme == target.Scheme &&
+		strings.EqualFold(origin.Hostname(), target.Hostname()) && originPort(origin) == originPort(target)
+}
+
+func originPort(u *url.URL) string {
+	if port := u.Port(); port != "" {
+		return port
+	}
+	if u.Scheme == "https" {
+		return "443"
+	}
+	return "80"
+}
+
+func checkControllerRedirect(req *http.Request, via []*http.Request) error {
+	if len(via) >= 10 {
+		return errors.New("stopped after 10 redirects")
+	}
+	if !sameControllerOrigin(via[0].URL, req.URL) {
+		return errors.New("refusing controller redirect to a different origin")
+	}
 	return nil
 }
 
@@ -299,7 +332,7 @@ func (c *ApiClient) getHosts(ctx context.Context) (*UnifiHostList, error) {
 	}
 
 	var hostList UnifiHostList
-	err := c.do(ctx, "GET", "https://api.ui.com/v1/hosts", nil, &hostList)
+	err := c.do(ctx, "GET", "/v1/hosts", nil, &hostList)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch hosts: %w", err)
 	}
@@ -313,9 +346,7 @@ func (c *ApiClient) getHosts(ctx context.Context) (*UnifiHostList, error) {
 func (c *ApiClient) setCloudConsoleID(consoleID string) {
 	c.cloudConsoleID = consoleID
 	if consoleID != "" {
-		// When using cloud connector, force the base URL to api.ui.com
-		// and default to new-style paths (cloud connector is always UniFi OS).
-		c.baseURL, _ = url.Parse("https://api.ui.com")
+		// Cloud Connector consoles always use UniFi OS paths.
 		c.apiPath = "/proxy/network"
 		c.loginPath = loginPathNew
 	}
@@ -657,13 +688,9 @@ func (c *ApiClient) doRequest(
 	respBody any,
 	query ...map[string]string,
 ) error {
-	var (
-		reqReader io.Reader
-		err       error
-		reqBytes  []byte
-	)
+	var reqReader io.Reader
 	if reqBody != nil {
-		reqBytes, err = json.Marshal(reqBody)
+		reqBytes, err := json.Marshal(reqBody)
 		if err != nil {
 			return fmt.Errorf("unable to marshal JSON: %s %s %w", method, relativeURL, err)
 		}
@@ -698,6 +725,9 @@ func (c *ApiClient) doRequest(
 	}
 
 	url := c.baseURL.ResolveReference(reqURL)
+	if !sameControllerOrigin(c.baseURL, url) {
+		return errors.New("refusing controller request to a different origin")
+	}
 	req, err := retryablehttp.NewRequestWithContext(ctx, method, url.String(), reqReader)
 	if err != nil {
 		return fmt.Errorf("unable to create request: %s %s %w", method, relativeURL, err)
@@ -769,6 +799,11 @@ func (c *ApiClient) doRequest(
 		if resp.StatusCode == http.StatusUnauthorized {
 			return &LoginRequiredError{APIKey: c.apiKey != ""}
 		}
+		// Some controllers and proxies echo rejected input. Keep the SNMP
+		// community and v3 credentials out of both error paths.
+		if method == http.MethodPut && strings.HasSuffix(url.Path, "/set/setting/snmp") {
+			return fmt.Errorf("SNMP settings update rejected (HTTP %d)", resp.StatusCode)
+		}
 		errBytes, _ := io.ReadAll(resp.Body)
 		errBody := struct {
 			Meta meta `json:"meta"`
@@ -809,12 +844,11 @@ func (c *ApiClient) doRequest(
 			}
 		}
 		return fmt.Errorf(
-			"%w (%s) for %s %s\npayload: %s",
+			"%w (%s) for %s %s",
 			apiErr,
 			strings.TrimSpace(resp.Status),
 			method,
 			url.String(),
-			redactSensitivePayload(reqBytes),
 		)
 	}
 
@@ -884,73 +918,6 @@ func parseRetryAfter(resp *http.Response) time.Duration {
 		}
 	}
 	return 0
-}
-
-// sensitivePayloadKeys are substrings of JSON field names whose values carry
-// secrets (WireGuard/IPsec keys, passphrases, RADIUS secrets, …) and must be
-// redacted from error messages and logs.
-var sensitivePayloadKeys = []string{
-	"private_key",
-	"passphrase",
-	"pre_shared_key",
-	"password",
-	"secret",
-	"psk",
-	"token",
-	"preshared_key",
-}
-
-// redactSensitivePayload returns the JSON request body with the values of any
-// sensitive fields replaced by "REDACTED", so secrets (e.g.
-// x_wireguard_private_key, x_passphrase, x_ipsec_pre_shared_key) are never
-// leaked into error messages. If the body is not valid JSON it is omitted.
-func redactSensitivePayload(b []byte) string {
-	if len(b) == 0 {
-		return ""
-	}
-	var v any
-	if err := json.Unmarshal(b, &v); err != nil {
-		return "[non-JSON payload omitted]"
-	}
-	redactSensitiveValue(v)
-	out, err := json.Marshal(v)
-	if err != nil {
-		return "[payload omitted]"
-	}
-	return string(out)
-}
-
-func redactSensitiveValue(v any) {
-	switch t := v.(type) {
-	case map[string]any:
-		for k, val := range t {
-			if isSensitiveKey(k) {
-				if _, ok := val.(string); ok {
-					t[k] = "REDACTED"
-					continue
-				}
-			}
-			redactSensitiveValue(val)
-		}
-	case []any:
-		for _, item := range t {
-			redactSensitiveValue(item)
-		}
-	}
-}
-
-func isSensitiveKey(k string) bool {
-	lk := strings.ToLower(k)
-	// UniFi prefixes its hidden fields, such as x_iapp_key and x_wep, with x_.
-	if strings.HasPrefix(lk, "x_") {
-		return true
-	}
-	for _, s := range sensitivePayloadKeys {
-		if strings.Contains(lk, s) {
-			return true
-		}
-	}
-	return false
 }
 
 func Ptr[T any](in T) *T {

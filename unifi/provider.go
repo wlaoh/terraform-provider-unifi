@@ -161,7 +161,7 @@ func (p *unifiProvider) Schema(
 				Sensitive: true,
 			},
 			"api_url": schema.StringAttribute{
-				MarkdownDescription: "URL of the controller API. Can be specified with the `UNIFI_API` environment variable. " +
+				MarkdownDescription: "Controller API URL. Use HTTPS for remote controllers. HTTP is supported on loopback for local development. Can be specified with the `UNIFI_API` environment variable. " +
 					"You should **NOT** supply the path (`/api`), the SDK will discover the appropriate paths. This is " +
 					"to support UDM Pro style API paths as well as more standard controller paths.",
 				Optional: true,
@@ -234,15 +234,20 @@ func (p *unifiProvider) Configure(
 		}
 	}
 
+	if config.CloudConnector.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(path.Root("cloud_connector"), "Unknown connection mode",
+			"Set cloud_connector to a known value before configuring the provider.")
+		return
+	}
 	allowInsecure := config.AllowInsecure.ValueBool()
-	if !allowInsecure {
+	if config.AllowInsecure.IsNull() {
 		if v := os.Getenv("UNIFI_INSECURE"); v != "" {
 			allowInsecure = v == "true"
 		}
 	}
 
 	cloudConnector := config.CloudConnector.ValueBool()
-	if !cloudConnector {
+	if config.CloudConnector.IsNull() {
 		if v := os.Getenv("UNIFI_CLOUD_CONNECTOR"); v != "" {
 			cloudConnector = v == "true"
 		}
@@ -265,15 +270,9 @@ func (p *unifiProvider) Configure(
 		site = "default"
 	}
 
-	ctx = tflog.SetField(ctx, "unifi_api_url", apiUrl)
-	ctx = tflog.SetField(ctx, "unifi_api_key", apiKey)
-	ctx = tflog.SetField(ctx, "unifi_username", username)
-	ctx = tflog.SetField(ctx, "unifi_password", password)
 	ctx = tflog.SetField(ctx, "unifi_site", site)
 	ctx = tflog.SetField(ctx, "unifi_allow_insecure", allowInsecure)
 	ctx = tflog.SetField(ctx, "unifi_cloud_connector", cloudConnector)
-	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "unifi_api_key")
-	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "unifi_password")
 
 	tflog.Debug(ctx, "Creating Unifi client")
 
@@ -290,6 +289,11 @@ func (p *unifiProvider) Configure(
 		// Force secure connections for cloud
 		allowInsecure = false
 	} else {
+		if config.AllowInsecure.IsUnknown() {
+			resp.Diagnostics.AddAttributeError(path.Root("allow_insecure"), "Unknown TLS verification setting",
+				"Set allow_insecure to a known value before connecting to the controller.")
+			return
+		}
 		// Direct connection validation
 		if apiUrl == "" {
 			resp.Diagnostics.AddAttributeError(

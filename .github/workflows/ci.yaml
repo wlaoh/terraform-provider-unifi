@@ -132,7 +132,7 @@ jobs:
     - name: Unit tests
       if: always()
       # -race requires cgo; the coverage profile feeds Codecov below.
-      run: go tool gotestsum --junitfile junit.xml -- -coverprofile=coverage.txt -covermode=atomic -race -count=1 -timeout 120m -v ./...
+      run: go tool gotestsum --junitfile junit.xml -- -coverprofile=coverage.txt -covermode=atomic -race -count=1 -timeout 120m -v ./... github.com/ubiquiti-community/go-unifi/unifi/...
       env:
         CGO_ENABLED: "1"
 
