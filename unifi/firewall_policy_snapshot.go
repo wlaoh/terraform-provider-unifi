@@ -20,9 +20,34 @@ type firewallPolicySnapshot struct {
 	byID    map[string]*unifi.FirewallPolicy
 }
 
-func (c *Client) readFirewallPolicy(ctx context.Context, site, id string) (*unifi.FirewallPolicy, error) {
-	entry, _ := c.firewallPolicies.LoadOrStore(site, &firewallPolicySnapshot{})
-	snapshot := entry.(*firewallPolicySnapshot)
+type firewallPolicyCache struct {
+	mu    sync.Mutex
+	sites map[string]*firewallPolicySnapshot
+}
+
+func (c *firewallPolicyCache) site(name string) *firewallPolicySnapshot {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.sites == nil {
+		c.sites = make(map[string]*firewallPolicySnapshot)
+	}
+	if c.sites[name] == nil {
+		c.sites[name] = &firewallPolicySnapshot{}
+	}
+	return c.sites[name]
+}
+
+func (c *firewallPolicyCache) clear() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	clear(c.sites)
+}
+
+func (c *Client) readFirewallPolicy(
+	ctx context.Context,
+	site, id string,
+) (*unifi.FirewallPolicy, error) {
+	snapshot := c.firewallPolicies.site(site)
 	snapshot.mu.Lock()
 	defer snapshot.mu.Unlock()
 
@@ -53,5 +78,7 @@ func (c *Client) readFirewallPolicy(ctx context.Context, site, id string) (*unif
 }
 
 func (c *Client) invalidateFirewallPolicies(site string) {
-	c.firewallPolicies.Delete(site)
+	c.firewallPolicies.mu.Lock()
+	defer c.firewallPolicies.mu.Unlock()
+	delete(c.firewallPolicies.sites, site)
 }

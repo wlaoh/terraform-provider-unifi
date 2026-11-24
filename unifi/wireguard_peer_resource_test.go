@@ -257,7 +257,6 @@ func TestWireguardPeerPresharedKey(t *testing.T) {
 		if !model.PresharedKey.IsNull() {
 			t.Fatal("refresh persisted a write-only secret")
 		}
-
 	})
 
 	t.Run("read refreshes an explicitly managed stateful key", func(t *testing.T) {

@@ -28,7 +28,10 @@ func TestWireGuardPeerRefreshKeepsUnmanagedKeyOutOfState(t *testing.T) {
 		t.Fatal(err)
 	}
 	for range 2 {
-		read, err := srv.ReadResource(ctx, &tfprotov6.ReadResourceRequest{TypeName: name, CurrentState: &state})
+		read, err := srv.ReadResource(
+			ctx,
+			&tfprotov6.ReadResourceRequest{TypeName: name, CurrentState: &state},
+		)
 		if err != nil {
 			t.Fatal(err)
 		}

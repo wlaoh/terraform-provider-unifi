@@ -22,17 +22,20 @@ func TestFirewallPolicyRefreshSharesSiteCollection(t *testing.T) {
 	mux.HandleFunc("GET /proxy/network/status", func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte(`{"meta":{"rc":"ok","server_version":"10.6.101"}}`))
 	})
-	mux.HandleFunc("GET /proxy/network/v2/api/site/{site}/firewall-policies", func(w http.ResponseWriter, r *http.Request) {
-		requests.Add(1)
-		policies := make([]unifi.FirewallPolicy, count)
-		for i := range policies {
-			policies[i].ID = strconv.Itoa(i)
-			policies[i].Name = r.PathValue("site")
-		}
-		if err := json.NewEncoder(w).Encode(policies); err != nil {
-			t.Error(err)
-		}
-	})
+	mux.HandleFunc(
+		"GET /proxy/network/v2/api/site/{site}/firewall-policies",
+		func(w http.ResponseWriter, r *http.Request) {
+			requests.Add(1)
+			policies := make([]unifi.FirewallPolicy, count)
+			for i := range policies {
+				policies[i].ID = strconv.Itoa(i)
+				policies[i].Name = r.PathValue("site")
+			}
+			if err := json.NewEncoder(w).Encode(policies); err != nil {
+				t.Error(err)
+			}
+		},
+	)
 	server := httptest.NewServer(mux)
 	t.Cleanup(server.Close)
 	ctx := t.Context()
@@ -72,8 +75,8 @@ func TestFirewallPolicyRefreshSharesSiteCollection(t *testing.T) {
 	read("second", "2")
 	expectRequests(4)
 
-	entry, _ := client.firewallPolicies.Load("second")
-	entry.(*firewallPolicySnapshot).expires = time.Now().Add(-time.Second)
+	entry := client.firewallPolicies.site("second")
+	entry.expires = time.Now().Add(-time.Second)
 	read("second", "3")
 	expectRequests(5)
 
@@ -86,7 +89,14 @@ func TestFirewallPolicyRefreshSharesSiteCollection(t *testing.T) {
 
 	canceled, cancel := context.WithCancel(ctx)
 	cancel()
-	if _, err := client.readFirewallPolicy(canceled, "first", "2"); !errors.Is(err, context.Canceled) {
+	if _, err := client.readFirewallPolicy(
+		canceled,
+		"first",
+		"2",
+	); !errors.Is(
+		err,
+		context.Canceled,
+	) {
 		t.Fatalf("expected context.Canceled, got %v", err)
 	}
 	expectRequests(6)

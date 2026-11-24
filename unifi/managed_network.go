@@ -28,7 +28,8 @@ func (kind managedNetworkKind) matches(n *unifi.Network) bool {
 	}
 	switch kind {
 	case lanNetwork:
-		return n.Purpose == unifi.PurposeCorporate || n.Purpose == unifi.PurposeGuest || n.Purpose == unifi.PurposeVLANOnly
+		return n.Purpose == unifi.PurposeCorporate || n.Purpose == unifi.PurposeGuest ||
+			n.Purpose == unifi.PurposeVLANOnly
 	case wanNetwork:
 		return n.Purpose == unifi.PurposeWAN
 	case vpnClientNetwork:
@@ -50,10 +51,20 @@ func (kind managedNetworkKind) validate(n *unifi.Network) error {
 	if n.VPNType != nil {
 		vpnType = *n.VPNType
 	}
-	return fmt.Errorf("network %q has purpose %q and VPN type %q, which cannot be managed by %s; check the resource type and import ID", n.ID, n.Purpose, vpnType, kind)
+	return fmt.Errorf(
+		"network %q has purpose %q and VPN type %q, which cannot be managed by %s; check the resource type and import ID",
+		n.ID,
+		n.Purpose,
+		vpnType,
+		kind,
+	)
 }
 
-func (c *Client) checkNetworkKind(ctx context.Context, site, id string, kind managedNetworkKind) error {
+func (c *Client) checkNetworkKind(
+	ctx context.Context,
+	site, id string,
+	kind managedNetworkKind,
+) error {
 	if id == "" {
 		return fmt.Errorf("%s requires a network ID before changing a controller record", kind)
 	}
@@ -64,7 +75,11 @@ func (c *Client) checkNetworkKind(ctx context.Context, site, id string, kind man
 	return kind.validate(n)
 }
 
-func (c *Client) deleteManagedNetwork(ctx context.Context, site, id, name string, kind managedNetworkKind) error {
+func (c *Client) deleteManagedNetwork(
+	ctx context.Context,
+	site, id, name string,
+	kind managedNetworkKind,
+) error {
 	if err := c.checkNetworkKind(ctx, site, id, kind); err != nil {
 		var missing *unifi.NotFoundError
 		if errors.As(err, &missing) {

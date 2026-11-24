@@ -926,7 +926,13 @@ func (r *siteToSiteVPNResource) Delete(
 
 	site := r.siteOrDefault(data.Site)
 
-	err := r.client.deleteManagedNetwork(ctx, site, data.ID.ValueString(), data.Name.ValueString(), siteVPNNetwork)
+	err := r.client.deleteManagedNetwork(
+		ctx,
+		site,
+		data.ID.ValueString(),
+		data.Name.ValueString(),
+		siteVPNNetwork,
+	)
 	if err != nil {
 		if _, ok := err.(*unifi.NotFoundError); ok {
 			return

@@ -1628,12 +1628,22 @@ func TestFirewallPolicyListFilterNames(t *testing.T) {
 	var response fwlist.ListResourceSchemaResponse
 	r := &firewallPolicyResource{}
 	r.ListResourceConfigSchema(t.Context(), fwlist.ListResourceSchemaRequest{}, &response)
-	filter := response.Schema.Blocks["filter"].(listschema.ListNestedBlock)
-	name := filter.NestedObject.Attributes["name"].(listschema.StringAttribute)
+	filter, ok := response.Schema.Blocks["filter"].(listschema.ListNestedBlock)
+	if !ok {
+		t.Fatal("missing filter block")
+	}
+	name, ok := filter.NestedObject.Attributes["name"].(listschema.StringAttribute)
+	if !ok {
+		t.Fatal("missing filter name attribute")
+	}
 	for _, key := range []string{"name", "enabled", "action", "naem"} {
 		var validation validator.StringResponse
 		for _, v := range name.Validators {
-			v.ValidateString(t.Context(), validator.StringRequest{ConfigValue: types.StringValue(key)}, &validation)
+			v.ValidateString(
+				t.Context(),
+				validator.StringRequest{ConfigValue: types.StringValue(key)},
+				&validation,
+			)
 		}
 		if validation.Diagnostics.HasError() != (key == "naem") {
 			t.Errorf("filter name %q produced diagnostics %v", key, validation.Diagnostics)

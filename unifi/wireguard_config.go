@@ -121,14 +121,21 @@ func parseWireGuardConfig(content string) (*wireguardConfigParsed, error) {
 	return result, nil
 }
 
-var wireguardEndpointHostname = regexp.MustCompile(`(?i)^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.?$`)
+var wireguardEndpointHostname = regexp.MustCompile(
+	`(?i)^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.?$`,
+)
 
 func parseEndpoint(endpoint string) (string, int64, error) {
 	host, portText, err := net.SplitHostPort(endpoint)
 	if err != nil || host == "" {
-		return "", 0, fmt.Errorf("WireGuard Endpoint must be a host and port; enclose IPv6 addresses in brackets")
+		return "", 0, fmt.Errorf(
+			"WireGuard Endpoint must be a host and port; enclose IPv6 addresses in brackets",
+		)
 	}
-	if _, err := netip.ParseAddr(host); err != nil && (len(host) > 253 || !wireguardEndpointHostname.MatchString(host)) {
+	if _, err := netip.ParseAddr(
+		host,
+	); err != nil &&
+		(len(host) > 253 || !wireguardEndpointHostname.MatchString(host)) {
 		return "", 0, fmt.Errorf("WireGuard Endpoint must have a valid IP address or DNS hostname")
 	}
 	port, err := strconv.ParseUint(portText, 10, 16)
@@ -145,7 +152,9 @@ func parseUniFiWireGuardFile(content string) (*wireguardConfigParsed, error) {
 		return nil, err
 	}
 	if config.AllowedIPs != "" {
-		return nil, fmt.Errorf("the UniFi manual VPN client API cannot preserve WireGuard AllowedIPs; use a method that enforces your peer selectors before omitting this directive")
+		return nil, fmt.Errorf(
+			"the UniFi manual VPN client API cannot preserve WireGuard AllowedIPs; use a method that enforces your peer selectors before omitting this directive",
+		)
 	}
 	return config, nil
 }
@@ -160,12 +169,20 @@ func (v wireguardFileValidator) MarkdownDescription(ctx context.Context) string 
 	return v.Description(ctx)
 }
 
-func (wireguardFileValidator) ValidateString(_ context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+func (wireguardFileValidator) ValidateString(
+	_ context.Context,
+	req validator.StringRequest,
+	resp *validator.StringResponse,
+) {
 	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
 		return
 	}
 	if _, err := parseUniFiWireGuardFile(req.ConfigValue.ValueString()); err != nil {
-		resp.Diagnostics.AddAttributeError(req.Path, "Invalid WireGuard Configuration File", err.Error())
+		resp.Diagnostics.AddAttributeError(
+			req.Path,
+			"Invalid WireGuard Configuration File",
+			err.Error(),
+		)
 	}
 }
 

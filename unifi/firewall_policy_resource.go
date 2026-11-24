@@ -1838,8 +1838,10 @@ func (r *firewallPolicyResource) ListResourceConfigSchema(
 					Attributes: map[string]listschema.Attribute{
 						"name": listschema.StringAttribute{
 							MarkdownDescription: "The name of the filter to apply. Supported values are: `name`, `action`, `enabled`.",
-							Validators:          []validator.String{stringvalidator.OneOf("name", "action", "enabled")},
-							Required:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf("name", "action", "enabled"),
+							},
+							Required: true,
 						},
 						"value": listschema.StringAttribute{
 							MarkdownDescription: "The value to filter by.",

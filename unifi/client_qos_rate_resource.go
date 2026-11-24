@@ -779,7 +779,8 @@ func (r *clientQosRateResource) List(
 				// ID/Name guard is satisfied.
 				var model clientQosRateResourceModel
 				model.ID = types.StringValue(clientGroup.ID)
-				result.Diagnostics.Append(r.clientQosRateToModel(ctx, &clientGroup, &model, site)...)
+				result.Diagnostics.Append(
+					r.clientQosRateToModel(ctx, &clientGroup, &model, site)...)
 				if !result.Diagnostics.HasError() {
 					model.Timeouts = timeoutsNullValue()
 					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)

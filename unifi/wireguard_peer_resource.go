@@ -639,7 +639,9 @@ func (r *wireguardPeerResource) peerToModel(
 
 	// Refresh and import start with a null write-only field. Only a key already
 	// managed in ordinary state may be refreshed from the controller.
-	if !model.PresharedKey.IsNull() && !model.PresharedKey.IsUnknown() && peer.PresharedKey != nil && *peer.PresharedKey != "" {
+	if !model.PresharedKey.IsNull() && !model.PresharedKey.IsUnknown() &&
+		peer.PresharedKey != nil &&
+		*peer.PresharedKey != "" {
 		model.PresharedKey = types.StringValue(*peer.PresharedKey)
 	} else {
 		model.PresharedKey = types.StringNull()

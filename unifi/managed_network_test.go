@@ -16,8 +16,10 @@ func TestManagedNetworkKinds(t *testing.T) {
 		vpnType string
 		want    managedNetworkKind
 	}{
-		{unifi.PurposeCorporate, "", lanNetwork}, {unifi.PurposeVLANOnly, "", lanNetwork},
-		{unifi.PurposeGuest, "", lanNetwork}, {unifi.PurposeWAN, "", wanNetwork},
+		{unifi.PurposeCorporate, "", lanNetwork},
+		{unifi.PurposeVLANOnly, "", lanNetwork},
+		{unifi.PurposeGuest, "", lanNetwork},
+		{unifi.PurposeWAN, "", wanNetwork},
 		{unifi.PurposeVPNClient, "wireguard-client", vpnClientNetwork},
 		{unifi.PurposeUserVPN, "wireguard-server", vpnServerNetwork},
 		{unifi.PurposeUserVPN, "l2tp-server", vpnServerNetwork},
@@ -55,20 +57,31 @@ func TestForeignNetworkCannotBeAdoptedOrDestroyed(t *testing.T) {
 		t.Run(string(k), func(t *testing.T) {
 			name := string(k)
 			typ := schemas.ResourceSchemas[name].ValueType()
-			state, err := tfprotov6.NewDynamicValue(typ, objectWithNulls(t, typ, map[string]tftypes.Value{
-				"id": tftypes.NewValue(tftypes.String, "lan"), "site": tftypes.NewValue(tftypes.String, "default"),
-			}))
+			state, err := tfprotov6.NewDynamicValue(
+				typ,
+				objectWithNulls(t, typ, map[string]tftypes.Value{
+					"id": tftypes.NewValue(
+						tftypes.String,
+						"lan",
+					),
+					"site": tftypes.NewValue(tftypes.String, "default"),
+				}),
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
-			read, err := srv.ReadResource(ctx, &tfprotov6.ReadResourceRequest{TypeName: name, CurrentState: &state})
+			read, err := srv.ReadResource(
+				ctx,
+				&tfprotov6.ReadResourceRequest{TypeName: name, CurrentState: &state},
+			)
 			if err != nil {
 				t.Fatal(err)
 			}
 			expectMismatch := func(ds []*tfprotov6.Diagnostic) {
 				t.Helper()
 				for _, d := range ds {
-					if d.Severity == tfprotov6.DiagnosticSeverityError && strings.Contains(d.Detail, "cannot be managed by "+name) {
+					if d.Severity == tfprotov6.DiagnosticSeverityError &&
+						strings.Contains(d.Detail, "cannot be managed by "+name) {
 						return
 					}
 				}
@@ -79,7 +92,15 @@ func TestForeignNetworkCannotBeAdoptedOrDestroyed(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			del, err := srv.ApplyResourceChange(ctx, &tfprotov6.ApplyResourceChangeRequest{TypeName: name, PriorState: &state, PlannedState: &nullState, Config: &nullState})
+			del, err := srv.ApplyResourceChange(
+				ctx,
+				&tfprotov6.ApplyResourceChangeRequest{
+					TypeName:     name,
+					PriorState:   &state,
+					PlannedState: &nullState,
+					Config:       &nullState,
+				},
+			)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -47,8 +47,13 @@ func TestProviderConnectionConfigPrecedence(t *testing.T) {
 			tt.attributes["username"] = "fixture-sensitive-username"
 			raw := tfValue(t, schema.Schema.Type().TerraformType(ctx), tt.attributes)
 			resp := &provider.ConfigureResponse{}
-			p.Configure(ctx, provider.ConfigureRequest{Config: tfsdk.Config{Schema: schema.Schema, Raw: raw}}, resp)
-			if strings.Contains(logs.String(), "fixture-sensitive-username") || strings.Contains(logs.String(), "fixture-api-key") {
+			p.Configure(
+				ctx,
+				provider.ConfigureRequest{Config: tfsdk.Config{Schema: schema.Schema, Raw: raw}},
+				resp,
+			)
+			if strings.Contains(logs.String(), "fixture-sensitive-username") ||
+				strings.Contains(logs.String(), "fixture-api-key") {
 				t.Fatal("authentication fields present in debug output")
 			}
 			if tt.wantError != "" {
@@ -62,7 +67,11 @@ func TestProviderConnectionConfigPrecedence(t *testing.T) {
 			}
 			// SDK version discovery is best-effort: a rejected fixture certificate
 			// produces an empty version. An explicitly allowed test certificate succeeds.
-			if got := resp.ResourceData.(*Client).Version(); (got != "") != tt.wantVersion {
+			client, ok := resp.ResourceData.(*Client)
+			if !ok {
+				t.Fatal("missing configured client")
+			}
+			if got := client.Version(); (got != "") != tt.wantVersion {
 				t.Fatalf("version %q, want successful TLS request %v", got, tt.wantVersion)
 			}
 		})
