@@ -215,7 +215,8 @@ func (r *bgpResource) Schema(
 				},
 			},
 			"config": schema.StringAttribute{
-				MarkdownDescription: "The raw FRRouting BGP daemon configuration. Conflicts with `asn`, `router_id`, and `peers`.",
+				Sensitive:           true,
+				MarkdownDescription: "The raw FRRouting BGP daemon configuration can contain credentials and is stored in Terraform state. Conflicts with `asn`, `router_id`, and `peers`.",
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.String{

@@ -637,17 +637,14 @@ func (r *wireguardPeerResource) peerToModel(
 	}
 	model.PublicKey = types.StringValue(peer.PublicKey)
 
-	// The controller returns the key in clear text and omits the field when the
-	// peer has none. Only mirror it into state when the state-bearing attribute
-	// is the one in use: with preshared_key_wo the secret must stay out of
-	// state, so the attribute is left as configured.
-	if model.PresharedKeyWO.IsNull() || model.PresharedKeyWO.IsUnknown() {
-		if peer.PresharedKey != nil && *peer.PresharedKey != "" {
-			model.PresharedKey = types.StringValue(*peer.PresharedKey)
-		} else {
-			model.PresharedKey = types.StringNull()
-		}
+	// Refresh and import start with a null write-only field. Only a key already
+	// managed in ordinary state may be refreshed from the controller.
+	if !model.PresharedKey.IsNull() && !model.PresharedKey.IsUnknown() && peer.PresharedKey != nil && *peer.PresharedKey != "" {
+		model.PresharedKey = types.StringValue(*peer.PresharedKey)
+	} else {
+		model.PresharedKey = types.StringNull()
 	}
+	model.PresharedKeyWO = types.StringNull()
 
 	allowedIPs, diags := types.ListValueFrom(ctx, types.StringType, peer.AllowedIPs)
 	model.AllowedIPs = allowedIPs

@@ -247,10 +247,22 @@ func TestWireguardPeerPresharedKey(t *testing.T) {
 				model.PresharedKey,
 			)
 		}
+		if !model.PresharedKeyWO.IsNull() {
+			t.Fatal("transient key retained in response model")
+		}
+		// A subsequent Read sees only persistent attributes, as does an import.
+		if diags := r.peerToModel(ctx, api, model, "default"); diags.HasError() {
+			t.Fatalf("refresh: %v", diags)
+		}
+		if !model.PresharedKey.IsNull() {
+			t.Fatal("refresh persisted a write-only secret")
+		}
+
 	})
 
-	t.Run("read adopts the controller key for the stateful attribute", func(t *testing.T) {
+	t.Run("read refreshes an explicitly managed stateful key", func(t *testing.T) {
 		model := base()
+		model.PresharedKey = types.StringValue("prior-key")
 		psk := "from-controller"
 		api := &unifi.WireGuardPeer{
 			ID:           "p1",

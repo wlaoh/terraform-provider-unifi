@@ -220,6 +220,10 @@ func Test_bgpResource_Schema(t *testing.T) {
 				t.Error("config should be Optional and Computed")
 			}
 
+			if !configAttr.Sensitive {
+				t.Error("raw configuration containing peer passwords must be sensitive")
+			}
+
 			// Verify asn is optional
 			asnAttr, ok := s.Attributes["asn"].(schema.Int64Attribute)
 			if !ok {

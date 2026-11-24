@@ -94,7 +94,7 @@ resource "unifi_bgp" "structured" {
 ### Optional
 
 - `asn` (Number) The BGP Autonomous System Number. Conflicts with `config`.
-- `config` (String) The raw FRRouting BGP daemon configuration. Conflicts with `asn`, `router_id`, and `peers`.
+- `config` (String, Sensitive) The raw FRRouting BGP daemon configuration can contain credentials and is stored in Terraform state. Conflicts with `asn`, `router_id`, and `peers`.
 - `description` (String) Description of the BGP configuration. Defaults to `BGP Configuration` for a new configuration; an existing one keeps the controller's value when this is not set (#544).
 - `enabled` (Boolean) Enable BGP routing. Taken from the controller when not set (a new configuration is created disabled), so adopting a running BGP configuration does not switch it off (#544).
 - `peers` (Attributes List) List of BGP peer groups. Conflicts with `config`. (see [below for nested schema](#nestedatt--peers))
