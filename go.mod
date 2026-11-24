@@ -248,3 +248,5 @@ tool (
 	github.com/miniscruff/changie
 	gotest.tools/gotestsum
 )
+
+replace github.com/ubiquiti-community/go-unifi => ./third_party/go-unifi

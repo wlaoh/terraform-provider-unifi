@@ -1,0 +1,1675 @@
+// Code generated from ace.jar fields *.json files
+// DO NOT EDIT.
+
+package unifi
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/ubiquiti-community/go-unifi/unifi/types"
+)
+
+// just to fix compile issues with the import.
+var (
+	_ context.Context
+	_ fmt.Formatter
+	_ json.Marshaler
+	_ types.Number
+	_ strconv.NumError
+	_ strings.Builder
+)
+
+type Device struct {
+	ID     string `json:"_id,omitempty"`
+	SiteID string `json:"site_id,omitempty"`
+
+	Hidden   bool   `json:"attr_hidden,omitempty"`
+	HiddenID string `json:"attr_hidden_id,omitempty"`
+	NoDelete bool   `json:"attr_no_delete,omitempty"`
+	NoEdit   bool   `json:"attr_no_edit,omitempty"`
+
+	MAC string `json:"mac,omitempty"`
+
+	Adopted                               bool                               `json:"adopted"`
+	AfcEnabled                            bool                               `json:"afc_enabled,omitempty"`
+	AtfEnabled                            bool                               `json:"atf_enabled,omitempty"`
+	AudioInfo                             *DeviceAudioInfo                   `json:"audio_info,omitempty"`
+	BandsteeringMode                      string                             `json:"bandsteering_mode,omitempty"` // off|equal|prefer_5g
+	BaresipAuthUser                       string                             `json:"baresip_auth_user,omitempty"` // ^\+?[a-zA-Z0-9_.\-!~*'()]*
+	BaresipEnabled                        bool                               `json:"baresip_enabled,omitempty"`
+	BaresipExtension                      string                             `json:"baresip_extension,omitempty"`  // ^\+?[a-zA-Z0-9_.\-!~*'()]*
+	BaresipPassword                       string                             `json:"x_baresip_password,omitempty"` // ^[a-zA-Z0-9_.\-!~*'()]*
+	BeepEnabled                           bool                               `json:"beep_enabled,omitempty"`
+	ConfigNetwork                         *DeviceConfigNetwork               `json:"config_network,omitempty"`
+	DPIEnabled                            bool                               `json:"dpi_enabled,omitempty"`
+	Disabled                              bool                               `json:"disabled,omitempty"`
+	Dot1XFallbackNetworkID                string                             `json:"dot1x_fallback_networkconf_id,omitempty"` // [\d\w-]+|
+	Dot1XPortctrlEnabled                  bool                               `json:"dot1x_portctrl_enabled,omitempty"`
+	EavBridgeRole                         string                             `json:"eav_bridge_role,omitempty"` // host|client
+	EtherLighting                         *DeviceEtherLighting               `json:"ether_lighting,omitempty"`
+	EthernetOverrides                     []DeviceEthernetOverrides          `json:"ethernet_overrides,omitempty"`
+	FanModeOverride                       string                             `json:"fan_mode_override,omitempty"` // default|quiet
+	FlowctrlEnabled                       bool                               `json:"flowctrl_enabled,omitempty"`
+	GatewayVrrpMode                       string                             `json:"gateway_vrrp_mode,omitempty"`     // primary|secondary
+	GatewayVrrpPriority                   *int64                             `json:"gateway_vrrp_priority,omitempty"` // [1-9][0-9]|[1-9][0-9][0-9]
+	GreenApEnabled                        bool                               `json:"green_ap_enabled,omitempty"`
+	HardwareOffload                       bool                               `json:"hardware_offload,omitempty"`
+	HdmiPorts                             *DeviceHdmiPorts                   `json:"hdmi_ports,omitempty"`
+	Hostname                              string                             `json:"hostname,omitempty"` // .{1,128}
+	IP                                    string                             `json:"ip,omitempty"`
+	InformIP                              string                             `json:"inform_ip,omitempty"`
+	JumboframeEnabled                     bool                               `json:"jumboframe_enabled,omitempty"`
+	LcmBrightness                         *int64                             `json:"lcm_brightness,omitempty"` // [1-9]|[1-9][0-9]|100
+	LcmBrightnessOverride                 bool                               `json:"lcm_brightness_override,omitempty"`
+	LcmIDleTimeout                        *int64                             `json:"lcm_idle_timeout,omitempty"` // [1-9][0-9]|[1-9][0-9][0-9]|[1-2][0-9][0-9][0-9]|3[0-5][0-9][0-9]|3600
+	LcmIDleTimeoutOverride                bool                               `json:"lcm_idle_timeout_override,omitempty"`
+	LcmNightModeBegins                    string                             `json:"lcm_night_mode_begins,omitempty"`    // (^$)|(^(0[0-9])|(1[0-9])|(2[0-3])):([0-5][0-9]$)
+	LcmNightModeEnds                      string                             `json:"lcm_night_mode_ends,omitempty"`      // (^$)|(^(0[0-9])|(1[0-9])|(2[0-3])):([0-5][0-9]$)
+	LcmOrientationOverride                *int64                             `json:"lcm_orientation_override,omitempty"` // 0|90|180|270
+	LcmSettingsRestrictedAccess           bool                               `json:"lcm_settings_restricted_access,omitempty"`
+	LcmStatus                             bool                               `json:"lcm_status,omitempty"`
+	LcmTrackerEnabled                     bool                               `json:"lcm_tracker_enabled,omitempty"`
+	LcmTrackerSeed                        string                             `json:"lcm_tracker_seed,omitempty"`              // .{0,50}
+	LedOverride                           string                             `json:"led_override,omitempty"`                  // default|on|off
+	LedOverrideColor                      string                             `json:"led_override_color,omitempty"`            // ^#(?:[0-9a-fA-F]{3}){1,2}$
+	LedOverrideColorBrightness            *int64                             `json:"led_override_color_brightness,omitempty"` // ^[0-9][0-9]?$|^100$
+	Locked                                bool                               `json:"locked,omitempty"`
+	LoopbackOverride                      bool                               `json:"loopback_override,omitempty"`
+	LowpfmodeOverride                     bool                               `json:"lowpfmode_override,omitempty"`
+	LteApn                                string                             `json:"lte_apn,omitempty"`       // .{1,128}
+	LteAuthType                           string                             `json:"lte_auth_type,omitempty"` // PAP|CHAP|PAP-CHAP|NONE
+	LteDataLimitEnabled                   bool                               `json:"lte_data_limit_enabled,omitempty"`
+	LteDataWarningEnabled                 bool                               `json:"lte_data_warning_enabled,omitempty"`
+	LteExtAnt                             bool                               `json:"lte_ext_ant,omitempty"`
+	LteHardLimit                          *int64                             `json:"lte_hard_limit,omitempty"`
+	LtePassword                           string                             `json:"lte_password,omitempty"`
+	LtePoe                                bool                               `json:"lte_poe,omitempty"`
+	LteRoamingAllowed                     bool                               `json:"lte_roaming_allowed,omitempty"`
+	LteSimPin                             *int64                             `json:"lte_sim_pin,omitempty"`
+	LteSoftLimit                          *int64                             `json:"lte_soft_limit,omitempty"`
+	LteUsername                           string                             `json:"lte_username,omitempty"`
+	MbbOverrides                          *DeviceMbbOverrides                `json:"mbb_overrides,omitempty"`
+	MeshMloEnabled                        bool                               `json:"mesh_mlo_enabled,omitempty"`
+	MeshStaVapEnabled                     bool                               `json:"mesh_sta_vap_enabled,omitempty"`
+	MgmtNetworkID                         string                             `json:"mgmt_network_id,omitempty"` // [\d\w-]+
+	Model                                 string                             `json:"model,omitempty"`
+	Name                                  string                             `json:"name,omitempty"` // .{0,128}
+	NutServer                             *DeviceNutServer                   `json:"nut_server,omitempty"`
+	OobPortConfig                         []DeviceOobPortConfig              `json:"oob_port_config,omitempty"`
+	OutdoorModeOverride                   string                             `json:"outdoor_mode_override,omitempty"` // default|on|off
+	OutletEnabled                         bool                               `json:"outlet_enabled,omitempty"`
+	OutletOverrides                       []DeviceOutletOverrides            `json:"outlet_overrides,omitempty"`
+	OutletPowerCycleEnabled               bool                               `json:"outlet_power_cycle_enabled,omitempty"`
+	OutletPowerCycleOnAcRecoveryEnabled   bool                               `json:"outlet_power_cycle_on_ac_recovery_enabled,omitempty"`
+	OutletPowerCycleOnAcRecoverySeconds   *int64                             `json:"outlet_power_cycle_on_ac_recovery_seconds,omitempty"`   // [6-9][0-9]|[1-5][0-9]{2}|600
+	OutletPowerCycleOnInternetLossSeconds *int64                             `json:"outlet_power_cycle_on_internet_loss_seconds,omitempty"` // [5-9]|[1-9][0-9]|[1-8][0-9]{2}|900
+	PeerToPeerMode                        string                             `json:"peer_to_peer_mode,omitempty"`                           // ap|sta
+	PoeMode                               string                             `json:"poe_mode,omitempty"`                                    // auto|pasv24|passthrough|off
+	PortOverrides                         []DevicePortOverrides              `json:"port_overrides"`
+	PortTable                             []DevicePortTable                  `json:"port_table,omitempty"`
+	PowerSourceCtrl                       string                             `json:"power_source_ctrl,omitempty"`        // auto|8023af|8023at|8023bt-type3|8023bt-type4|pasv24|poe-injector|ac|adapter|dc|rps
+	PowerSourceCtrlBudget                 *int64                             `json:"power_source_ctrl_budget,omitempty"` // [0-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]
+	PowerSourceCtrlEnabled                bool                               `json:"power_source_ctrl_enabled,omitempty"`
+	PrecisionTimeProtocolConfig           *DevicePrecisionTimeProtocolConfig `json:"precision_time_protocol_config,omitempty"`
+	PtmpApMAC                             string                             `json:"ptmp_ap_mac,omitempty"` // ^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$
+	PtpApMAC                              string                             `json:"ptp_ap_mac,omitempty"`  // ^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$
+	RADIUSProfileID                       string                             `json:"radiusprofile_id,omitempty"`
+	RadioTable                            []DeviceRadioTable                 `json:"radio_table,omitempty"`
+	ResetbtnEnabled                       string                             `json:"resetbtn_enabled,omitempty"` // on|off
+	RpsOverride                           *DeviceRpsOverride                 `json:"rps_override,omitempty"`
+	SmaPortConfig                         *DeviceSmaPortConfig               `json:"sma_port_config,omitempty"`
+	SnmpContact                           string                             `json:"snmp_contact,omitempty"`  // .{0,255}
+	SnmpLocation                          string                             `json:"snmp_location,omitempty"` // .{0,255}
+	State                                 DeviceState                        `json:"state"`
+	StationMode                           string                             `json:"station_mode,omitempty"` // ptp|ptmp|wifi
+	StpPriority                           *int64                             `json:"stp_priority,omitempty"` // 0|4096|8192|12288|16384|20480|24576|28672|32768|36864|40960|45056|49152|53248|57344|61440
+	StpVersion                            string                             `json:"stp_version,omitempty"`  // stp|rstp|disabled
+	SwitchVLANEnabled                     bool                               `json:"switch_vlan_enabled,omitempty"`
+	Type                                  string                             `json:"type,omitempty"`
+	UbbPairName                           string                             `json:"ubb_pair_name,omitempty"`                  // .{1,128}
+	UpsShutdownRemainingMinutes           *int64                             `json:"ups_shutdown_remaining_minutes,omitempty"` // [1-9]|1[0-5]
+	VbmsOverride                          *DeviceVbmsOverride                `json:"vbms_override,omitempty"`
+	VideoInfo                             *DeviceVideoInfo                   `json:"video_info,omitempty"`
+	Volume                                *int64                             `json:"volume,omitempty"` // [0-9]|[1-9][0-9]|100
+}
+
+func (dst *Device) UnmarshalJSON(b []byte) error {
+	type Alias Device
+	aux := &struct {
+		GatewayVrrpPriority                   *types.Number `json:"gateway_vrrp_priority"`
+		LcmBrightness                         *types.Number `json:"lcm_brightness"`
+		LcmIDleTimeout                        *types.Number `json:"lcm_idle_timeout"`
+		LcmOrientationOverride                *types.Number `json:"lcm_orientation_override"`
+		LedOverrideColorBrightness            *types.Number `json:"led_override_color_brightness"`
+		LteHardLimit                          *types.Number `json:"lte_hard_limit"`
+		LteSimPin                             *types.Number `json:"lte_sim_pin"`
+		LteSoftLimit                          *types.Number `json:"lte_soft_limit"`
+		OutletPowerCycleOnAcRecoverySeconds   *types.Number `json:"outlet_power_cycle_on_ac_recovery_seconds"`
+		OutletPowerCycleOnInternetLossSeconds *types.Number `json:"outlet_power_cycle_on_internet_loss_seconds"`
+		PowerSourceCtrlBudget                 *types.Number `json:"power_source_ctrl_budget"`
+		StpPriority                           *types.Number `json:"stp_priority"`
+		UpsShutdownRemainingMinutes           *types.Number `json:"ups_shutdown_remaining_minutes"`
+		Volume                                *types.Number `json:"volume"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.GatewayVrrpPriority != nil {
+		if val, err := aux.GatewayVrrpPriority.Int64(); err == nil {
+			dst.GatewayVrrpPriority = &val
+		} else if string(*aux.GatewayVrrpPriority) == "" {
+			var zero int64
+			dst.GatewayVrrpPriority = &zero
+		}
+	}
+	if aux.LcmBrightness != nil {
+		if val, err := aux.LcmBrightness.Int64(); err == nil {
+			dst.LcmBrightness = &val
+		} else if string(*aux.LcmBrightness) == "" {
+			var zero int64
+			dst.LcmBrightness = &zero
+		}
+	}
+	if aux.LcmIDleTimeout != nil {
+		if val, err := aux.LcmIDleTimeout.Int64(); err == nil {
+			dst.LcmIDleTimeout = &val
+		} else if string(*aux.LcmIDleTimeout) == "" {
+			var zero int64
+			dst.LcmIDleTimeout = &zero
+		}
+	}
+	if aux.LcmOrientationOverride != nil {
+		if val, err := aux.LcmOrientationOverride.Int64(); err == nil {
+			dst.LcmOrientationOverride = &val
+		} else if string(*aux.LcmOrientationOverride) == "" {
+			var zero int64
+			dst.LcmOrientationOverride = &zero
+		}
+	}
+	if aux.LedOverrideColorBrightness != nil {
+		if val, err := aux.LedOverrideColorBrightness.Int64(); err == nil {
+			dst.LedOverrideColorBrightness = &val
+		} else if string(*aux.LedOverrideColorBrightness) == "" {
+			var zero int64
+			dst.LedOverrideColorBrightness = &zero
+		}
+	}
+	if aux.LteHardLimit != nil {
+		if val, err := aux.LteHardLimit.Int64(); err == nil {
+			dst.LteHardLimit = &val
+		} else if string(*aux.LteHardLimit) == "" {
+			var zero int64
+			dst.LteHardLimit = &zero
+		}
+	}
+	if aux.LteSimPin != nil {
+		if val, err := aux.LteSimPin.Int64(); err == nil {
+			dst.LteSimPin = &val
+		} else if string(*aux.LteSimPin) == "" {
+			var zero int64
+			dst.LteSimPin = &zero
+		}
+	}
+	if aux.LteSoftLimit != nil {
+		if val, err := aux.LteSoftLimit.Int64(); err == nil {
+			dst.LteSoftLimit = &val
+		} else if string(*aux.LteSoftLimit) == "" {
+			var zero int64
+			dst.LteSoftLimit = &zero
+		}
+	}
+	if aux.OutletPowerCycleOnAcRecoverySeconds != nil {
+		if val, err := aux.OutletPowerCycleOnAcRecoverySeconds.Int64(); err == nil {
+			dst.OutletPowerCycleOnAcRecoverySeconds = &val
+		} else if string(*aux.OutletPowerCycleOnAcRecoverySeconds) == "" {
+			var zero int64
+			dst.OutletPowerCycleOnAcRecoverySeconds = &zero
+		}
+	}
+	if aux.OutletPowerCycleOnInternetLossSeconds != nil {
+		if val, err := aux.OutletPowerCycleOnInternetLossSeconds.Int64(); err == nil {
+			dst.OutletPowerCycleOnInternetLossSeconds = &val
+		} else if string(*aux.OutletPowerCycleOnInternetLossSeconds) == "" {
+			var zero int64
+			dst.OutletPowerCycleOnInternetLossSeconds = &zero
+		}
+	}
+	if aux.PowerSourceCtrlBudget != nil {
+		if val, err := aux.PowerSourceCtrlBudget.Int64(); err == nil {
+			dst.PowerSourceCtrlBudget = &val
+		} else if string(*aux.PowerSourceCtrlBudget) == "" {
+			var zero int64
+			dst.PowerSourceCtrlBudget = &zero
+		}
+	}
+	if aux.StpPriority != nil {
+		if val, err := aux.StpPriority.Int64(); err == nil {
+			dst.StpPriority = &val
+		} else if string(*aux.StpPriority) == "" {
+			var zero int64
+			dst.StpPriority = &zero
+		}
+	}
+	if aux.UpsShutdownRemainingMinutes != nil {
+		if val, err := aux.UpsShutdownRemainingMinutes.Int64(); err == nil {
+			dst.UpsShutdownRemainingMinutes = &val
+		} else if string(*aux.UpsShutdownRemainingMinutes) == "" {
+			var zero int64
+			dst.UpsShutdownRemainingMinutes = &zero
+		}
+	}
+	if aux.Volume != nil {
+		if val, err := aux.Volume.Int64(); err == nil {
+			dst.Volume = &val
+		} else if string(*aux.Volume) == "" {
+			var zero int64
+			dst.Volume = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceAudioInfo struct {
+	Channel *int64 `json:"channel,omitempty"` // [2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]
+	Role    string `json:"role,omitempty"`    // host|client
+}
+
+func (dst *DeviceAudioInfo) UnmarshalJSON(b []byte) error {
+	type Alias DeviceAudioInfo
+	aux := &struct {
+		Channel *types.Number `json:"channel"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.Channel != nil {
+		if val, err := aux.Channel.Int64(); err == nil {
+			dst.Channel = &val
+		} else if string(*aux.Channel) == "" {
+			var zero int64
+			dst.Channel = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceConfigNetwork struct {
+	BondingEnabled bool   `json:"bonding_enabled"`
+	DNS1           string `json:"dns1"` // ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$|^$
+	DNS2           string `json:"dns2"` // ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$|^$
+	DNSsuffix      string `json:"dnssuffix"`
+	Gateway        string `json:"gateway"`           // ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^$
+	IP             string `json:"ip,omitempty"`      // ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
+	Netmask        string `json:"netmask,omitempty"` // ^((128|192|224|240|248|252|254)\.0\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0\.0)|(255\.(((0|128|192|224|240|248|252|254)\.0)|255\.(0|128|192|224|240|248|252|254)))))$
+	Type           string `json:"type,omitempty"`    // dhcp|static
+}
+
+func (dst *DeviceConfigNetwork) UnmarshalJSON(b []byte) error {
+	type Alias DeviceConfigNetwork
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceCurrentApn struct {
+	Apn      string `json:"apn,omitempty"`
+	AuthType string `json:"auth_type,omitempty"` // PAP|CHAP|PAP-CHAP|NONE
+	PDpType  string `json:"pdp_type,omitempty"`  // IPv4|IPv6|IPv4v6
+	Password string `json:"password,omitempty"`
+	Roaming  bool   `json:"roaming,omitempty"`
+	Username string `json:"username,omitempty"`
+}
+
+func (dst *DeviceCurrentApn) UnmarshalJSON(b []byte) error {
+	type Alias DeviceCurrentApn
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceEtherLighting struct {
+	Behavior   string `json:"behavior,omitempty"`   // breath|steady
+	Brightness *int64 `json:"brightness,omitempty"` // [1-9]|[1-9][0-9]|100
+	LedMode    string `json:"led_mode,omitempty"`   // standard|etherlighting
+	Mode       string `json:"mode,omitempty"`       // speed|network
+}
+
+func (dst *DeviceEtherLighting) UnmarshalJSON(b []byte) error {
+	type Alias DeviceEtherLighting
+	aux := &struct {
+		Brightness *types.Number `json:"brightness"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.Brightness != nil {
+		if val, err := aux.Brightness.Int64(); err == nil {
+			dst.Brightness = &val
+		} else if string(*aux.Brightness) == "" {
+			var zero int64
+			dst.Brightness = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceEthernetOverrides struct {
+	Disabled     bool   `json:"disabled,omitempty"`
+	Ifname       string `json:"ifname,omitempty"`       // eth[0-9]{1,2}
+	NetworkGroup string `json:"networkgroup,omitempty"` // LAN[2-8]?|WAN[2-9]?|MGMT
+}
+
+func (dst *DeviceEthernetOverrides) UnmarshalJSON(b []byte) error {
+	type Alias DeviceEthernetOverrides
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceHdmiPorts struct {
+	ColorFormat string `json:"color_format,omitempty"`
+	Connected   bool   `json:"connected,omitempty"`
+	Latency     string `json:"latency,omitempty"`
+	PortIndex   string `json:"port_index,omitempty"`
+	RefreshRate string `json:"refresh_rate,omitempty"`
+	Resolution  string `json:"resolution,omitempty"`
+	State       string `json:"state,omitempty"` // CLIENT_STATE_SUSPENDING|WAITING_HOST_MODE|OPERATING
+	Type        string `json:"type,omitempty"`  // in|out
+	Up          bool   `json:"up,omitempty"`
+}
+
+func (dst *DeviceHdmiPorts) UnmarshalJSON(b []byte) error {
+	type Alias DeviceHdmiPorts
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceIPV6 struct {
+	IP      string `json:"ip,omitempty"`      // ^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$|^$
+	Netmask *int64 `json:"netmask,omitempty"` // ^(0|[1-9]|[1-8][0-9]|9[0-9]|1[01][0-9]|12[0-8])$|^$
+	Type    string `json:"type,omitempty"`    // slaac|dhcp|static|none
+}
+
+func (dst *DeviceIPV6) UnmarshalJSON(b []byte) error {
+	type Alias DeviceIPV6
+	aux := &struct {
+		Netmask *types.Number `json:"netmask"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.Netmask != nil {
+		if val, err := aux.Netmask.Int64(); err == nil {
+			dst.Netmask = &val
+		} else if string(*aux.Netmask) == "" {
+			var zero int64
+			dst.Netmask = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceIPv4 struct {
+	IP      string `json:"ip,omitempty"`      // ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$
+	Netmask *int64 `json:"netmask,omitempty"` // ^(0|[1-9]|1[0-9]|2[0-9]|3[0-2])$|^$
+	Type    string `json:"type,omitempty"`    // dhcp|static
+}
+
+func (dst *DeviceIPv4) UnmarshalJSON(b []byte) error {
+	type Alias DeviceIPv4
+	aux := &struct {
+		Netmask *types.Number `json:"netmask"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.Netmask != nil {
+		if val, err := aux.Netmask.Int64(); err == nil {
+			dst.Netmask = &val
+		} else if string(*aux.Netmask) == "" {
+			var zero int64
+			dst.Netmask = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceMbbOverrides struct {
+	PrimarySlot *int64      `json:"primary_slot,omitempty"` // 1|2
+	Sim         []DeviceSim `json:"sim,omitempty"`
+}
+
+func (dst *DeviceMbbOverrides) UnmarshalJSON(b []byte) error {
+	type Alias DeviceMbbOverrides
+	aux := &struct {
+		PrimarySlot *types.Number `json:"primary_slot"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.PrimarySlot != nil {
+		if val, err := aux.PrimarySlot.Int64(); err == nil {
+			dst.PrimarySlot = &val
+		} else if string(*aux.PrimarySlot) == "" {
+			var zero int64
+			dst.PrimarySlot = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceNutServer struct {
+	CredentialRequired bool   `json:"credential_required,omitempty"`
+	Enabled            bool   `json:"enabled,omitempty"`
+	ID                 string `json:"id,omitempty"`
+	Password           string `json:"password,omitempty"`
+	Port               *int64 `json:"port,omitempty"`
+	Username           string `json:"username,omitempty"`
+}
+
+func (dst *DeviceNutServer) UnmarshalJSON(b []byte) error {
+	type Alias DeviceNutServer
+	aux := &struct {
+		Port *types.Number `json:"port"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.Port != nil {
+		if val, err := aux.Port.Int64(); err == nil {
+			dst.Port = &val
+		} else if string(*aux.Port) == "" {
+			var zero int64
+			dst.Port = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceOobPortConfig struct {
+	Enabled bool        `json:"enabled,omitempty"`
+	IPV6    *DeviceIPV6 `json:"ipv6,omitempty"`
+	IPv4    *DeviceIPv4 `json:"ipv4,omitempty"`
+	UnitID  *int64      `json:"unit_id,omitempty"` // [1-8]
+}
+
+func (dst *DeviceOobPortConfig) UnmarshalJSON(b []byte) error {
+	type Alias DeviceOobPortConfig
+	aux := &struct {
+		UnitID *types.Number `json:"unit_id"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.UnitID != nil {
+		if val, err := aux.UnitID.Int64(); err == nil {
+			dst.UnitID = &val
+		} else if string(*aux.UnitID) == "" {
+			var zero int64
+			dst.UnitID = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceOutletOverrides struct {
+	CycleEnabled bool   `json:"cycle_enabled,omitempty"`
+	Index        *int64 `json:"index,omitempty"`
+	Name         string `json:"name,omitempty"` // .{0,128}
+	RelayState   bool   `json:"relay_state,omitempty"`
+}
+
+func (dst *DeviceOutletOverrides) UnmarshalJSON(b []byte) error {
+	type Alias DeviceOutletOverrides
+	aux := &struct {
+		Index *types.Number `json:"index"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.Index != nil {
+		if val, err := aux.Index.Int64(); err == nil {
+			dst.Index = &val
+		} else if string(*aux.Index) == "" {
+			var zero int64
+			dst.Index = &zero
+		}
+	}
+
+	return nil
+}
+
+type DevicePortOverrides struct {
+	AggregateMembers             []int64           `json:"aggregate_members,omitempty"` // [1-9]|[1-4][0-9]|5[0-6]
+	Autoneg                      *bool             `json:"autoneg,omitempty"`
+	Dot1XCtrl                    string            `json:"dot1x_ctrl,omitempty"`         // auto|force_authorized|force_unauthorized|mac_based|multi_host
+	Dot1XIDleTimeout             *int64            `json:"dot1x_idle_timeout,omitempty"` // [0-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]
+	EeeEnabled                   *bool             `json:"eee_enabled,omitempty"`
+	EgressRateLimitKbps          *int64            `json:"egress_rate_limit_kbps,omitempty"` // 6[4-9]|[7-9][0-9]|[1-9][0-9]{2,6}
+	EgressRateLimitKbpsEnabled   *bool             `json:"egress_rate_limit_kbps_enabled,omitempty"`
+	ExcludedNetworkIDs           []string          `json:"excluded_networkconf_ids,omitempty"`
+	FecMode                      string            `json:"fec_mode,omitempty"` // rs-fec|fc-fec|default|disabled
+	FlowControlEnabled           *bool             `json:"flow_control_enabled,omitempty"`
+	Forward                      string            `json:"forward,omitempty"` // all|native|customize|disabled
+	FullDuplex                   *bool             `json:"full_duplex,omitempty"`
+	Isolation                    *bool             `json:"isolation,omitempty"`
+	LdMode                       *bool             `json:"ld_mode,omitempty"`
+	LdStatus                     *bool             `json:"ld_status,omitempty"`
+	LinkDebounce                 *int64            `json:"link_debounce,omitempty"` // 0|[1-9]00|[1-4][0-9]00|5000
+	LinkDebounceAuto             *bool             `json:"link_debounce_auto,omitempty"`
+	LldpmedEnabled               *bool             `json:"lldpmed_enabled,omitempty"`
+	LldpmedNotifyEnabled         *bool             `json:"lldpmed_notify_enabled,omitempty"`
+	MirrorPortIDX                *int64            `json:"mirror_port_idx,omitempty"`       // [1-9]|[1-4][0-9]|5[0-6]
+	MulticastRouterMode          string            `json:"multicast_router_mode,omitempty"` // ALL|CUSTOM|NONE
+	MulticastRouterNetworkIDs    []string          `json:"multicast_router_networkconf_ids,omitempty"`
+	NATiveNetworkID              string            `json:"native_networkconf_id,omitempty"`
+	Name                         string            `json:"name,omitempty"`     // .{0,128}
+	OpMode                       string            `json:"op_mode,omitempty"`  // switch|mirror|aggregate|routed|routed_aggregate
+	PoeMode                      string            `json:"poe_mode,omitempty"` // auto|pasv24|passthrough|off
+	PortIDX                      *int64            `json:"port_idx,omitempty"` // [1-9]|[1-4][0-9]|5[0-6]
+	PortKeepaliveEnabled         *bool             `json:"port_keepalive_enabled,omitempty"`
+	PortProfileID                string            `json:"portconf_id,omitempty"` // [\d\w-]+
+	PortSecurityEnabled          *bool             `json:"port_security_enabled,omitempty"`
+	PortSecurityMACAddress       []string          `json:"port_security_mac_address,omitempty"` // ^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$
+	PrecisionTimeProtocolEnabled *bool             `json:"precision_time_protocol_enabled,omitempty"`
+	PriorityQueue1Level          *int64            `json:"priority_queue1_level,omitempty"` // [0-9]|[1-9][0-9]|100
+	PriorityQueue2Level          *int64            `json:"priority_queue2_level,omitempty"` // [0-9]|[1-9][0-9]|100
+	PriorityQueue3Level          *int64            `json:"priority_queue3_level,omitempty"` // [0-9]|[1-9][0-9]|100
+	PriorityQueue4Level          *int64            `json:"priority_queue4_level,omitempty"` // [0-9]|[1-9][0-9]|100
+	QOSProfile                   *DeviceQOSProfile `json:"qos_profile,omitempty"`
+	RoutedNetworkID              string            `json:"routed_networkconf_id,omitempty"`
+	SdWANUnderlayPort            *bool             `json:"sd_wan_underlay_port,omitempty"`
+	SdWANUnderlayPortNetworkID   string            `json:"sd_wan_underlay_port_networkconf_id,omitempty"`
+	SettingPreference            string            `json:"setting_preference,omitempty"` // auto|manual
+	Speed                        *int64            `json:"speed,omitempty"`              // 10|100|1000|2500|5000|10000|20000|25000|40000|50000|100000
+	StablePortEnabled            *bool             `json:"stable_port_enabled,omitempty"`
+	StormctrlBroadcastastEnabled *bool             `json:"stormctrl_bcast_enabled,omitempty"`
+	StormctrlBroadcastastLevel   *int64            `json:"stormctrl_bcast_level,omitempty"` // [0-9]|[1-9][0-9]|100
+	StormctrlBroadcastastRate    *int64            `json:"stormctrl_bcast_rate,omitempty"`  // [0-9]|[1-9][0-9]{1,6}|1[0-3][0-9]{6}|14[0-7][0-9]{5}|148[0-7][0-9]{4}|14880000
+	StormctrlMcastEnabled        *bool             `json:"stormctrl_mcast_enabled,omitempty"`
+	StormctrlMcastLevel          *int64            `json:"stormctrl_mcast_level,omitempty"` // [0-9]|[1-9][0-9]|100
+	StormctrlMcastRate           *int64            `json:"stormctrl_mcast_rate,omitempty"`  // [0-9]|[1-9][0-9]{1,6}|1[0-3][0-9]{6}|14[0-7][0-9]{5}|148[0-7][0-9]{4}|14880000
+	StormctrlType                string            `json:"stormctrl_type,omitempty"`        // level|rate
+	StormctrlUcastEnabled        *bool             `json:"stormctrl_ucast_enabled,omitempty"`
+	StormctrlUcastLevel          *int64            `json:"stormctrl_ucast_level,omitempty"` // [0-9]|[1-9][0-9]|100
+	StormctrlUcastRate           *int64            `json:"stormctrl_ucast_rate,omitempty"`  // [0-9]|[1-9][0-9]{1,6}|1[0-3][0-9]{6}|14[0-7][0-9]{5}|148[0-7][0-9]{4}|14880000
+	StpBpduGuardEnabled          *bool             `json:"stp_bpdu_guard_enabled,omitempty"`
+	StpEdgeState                 string            `json:"stp_edge_state,omitempty"` // auto|enabled|disabled
+	StpPortMode                  *bool             `json:"stp_port_mode,omitempty"`
+	StpUplink                    *bool             `json:"stp_uplink,omitempty"`
+	TaggedNetworkIDs             []string          `json:"tagged_networkconf_ids,omitempty"`
+	TaggedVLANMgmt               string            `json:"tagged_vlan_mgmt,omitempty"` // auto|block_all|custom
+	TrustedPortMAC               string            `json:"trusted_port_mac,omitempty"` // (^$|^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$)
+	UnitID                       *int64            `json:"unit_id,omitempty"`          // [1-8]
+	VoiceNetworkID               string            `json:"voice_networkconf_id,omitempty"`
+}
+
+func (dst *DevicePortOverrides) UnmarshalJSON(b []byte) error {
+	type Alias DevicePortOverrides
+	aux := &struct {
+		AggregateMembers           []types.Number `json:"aggregate_members"`
+		Dot1XIDleTimeout           *types.Number  `json:"dot1x_idle_timeout"`
+		EgressRateLimitKbps        *types.Number  `json:"egress_rate_limit_kbps"`
+		LinkDebounce               *types.Number  `json:"link_debounce"`
+		MirrorPortIDX              *types.Number  `json:"mirror_port_idx"`
+		PortIDX                    *types.Number  `json:"port_idx"`
+		PriorityQueue1Level        *types.Number  `json:"priority_queue1_level"`
+		PriorityQueue2Level        *types.Number  `json:"priority_queue2_level"`
+		PriorityQueue3Level        *types.Number  `json:"priority_queue3_level"`
+		PriorityQueue4Level        *types.Number  `json:"priority_queue4_level"`
+		Speed                      *types.Number  `json:"speed"`
+		StormctrlBroadcastastLevel *types.Number  `json:"stormctrl_bcast_level"`
+		StormctrlBroadcastastRate  *types.Number  `json:"stormctrl_bcast_rate"`
+		StormctrlMcastLevel        *types.Number  `json:"stormctrl_mcast_level"`
+		StormctrlMcastRate         *types.Number  `json:"stormctrl_mcast_rate"`
+		StormctrlUcastLevel        *types.Number  `json:"stormctrl_ucast_level"`
+		StormctrlUcastRate         *types.Number  `json:"stormctrl_ucast_rate"`
+		UnitID                     *types.Number  `json:"unit_id"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	dst.AggregateMembers = make([]int64, len(aux.AggregateMembers))
+	for i, v := range aux.AggregateMembers {
+		if val, err := v.Int64(); err == nil {
+			dst.AggregateMembers[i] = val
+		}
+	}
+	if aux.Dot1XIDleTimeout != nil {
+		if val, err := aux.Dot1XIDleTimeout.Int64(); err == nil {
+			dst.Dot1XIDleTimeout = &val
+		} else if string(*aux.Dot1XIDleTimeout) == "" {
+			var zero int64
+			dst.Dot1XIDleTimeout = &zero
+		}
+	}
+	if aux.EgressRateLimitKbps != nil {
+		if val, err := aux.EgressRateLimitKbps.Int64(); err == nil {
+			dst.EgressRateLimitKbps = &val
+		} else if string(*aux.EgressRateLimitKbps) == "" {
+			var zero int64
+			dst.EgressRateLimitKbps = &zero
+		}
+	}
+	if aux.LinkDebounce != nil {
+		if val, err := aux.LinkDebounce.Int64(); err == nil {
+			dst.LinkDebounce = &val
+		} else if string(*aux.LinkDebounce) == "" {
+			var zero int64
+			dst.LinkDebounce = &zero
+		}
+	}
+	if aux.MirrorPortIDX != nil {
+		if val, err := aux.MirrorPortIDX.Int64(); err == nil {
+			dst.MirrorPortIDX = &val
+		} else if string(*aux.MirrorPortIDX) == "" {
+			var zero int64
+			dst.MirrorPortIDX = &zero
+		}
+	}
+	if aux.PortIDX != nil {
+		if val, err := aux.PortIDX.Int64(); err == nil {
+			dst.PortIDX = &val
+		} else if string(*aux.PortIDX) == "" {
+			var zero int64
+			dst.PortIDX = &zero
+		}
+	}
+	if aux.PriorityQueue1Level != nil {
+		if val, err := aux.PriorityQueue1Level.Int64(); err == nil {
+			dst.PriorityQueue1Level = &val
+		} else if string(*aux.PriorityQueue1Level) == "" {
+			var zero int64
+			dst.PriorityQueue1Level = &zero
+		}
+	}
+	if aux.PriorityQueue2Level != nil {
+		if val, err := aux.PriorityQueue2Level.Int64(); err == nil {
+			dst.PriorityQueue2Level = &val
+		} else if string(*aux.PriorityQueue2Level) == "" {
+			var zero int64
+			dst.PriorityQueue2Level = &zero
+		}
+	}
+	if aux.PriorityQueue3Level != nil {
+		if val, err := aux.PriorityQueue3Level.Int64(); err == nil {
+			dst.PriorityQueue3Level = &val
+		} else if string(*aux.PriorityQueue3Level) == "" {
+			var zero int64
+			dst.PriorityQueue3Level = &zero
+		}
+	}
+	if aux.PriorityQueue4Level != nil {
+		if val, err := aux.PriorityQueue4Level.Int64(); err == nil {
+			dst.PriorityQueue4Level = &val
+		} else if string(*aux.PriorityQueue4Level) == "" {
+			var zero int64
+			dst.PriorityQueue4Level = &zero
+		}
+	}
+	if aux.Speed != nil {
+		if val, err := aux.Speed.Int64(); err == nil {
+			dst.Speed = &val
+		} else if string(*aux.Speed) == "" {
+			var zero int64
+			dst.Speed = &zero
+		}
+	}
+	if aux.StormctrlBroadcastastLevel != nil {
+		if val, err := aux.StormctrlBroadcastastLevel.Int64(); err == nil {
+			dst.StormctrlBroadcastastLevel = &val
+		} else if string(*aux.StormctrlBroadcastastLevel) == "" {
+			var zero int64
+			dst.StormctrlBroadcastastLevel = &zero
+		}
+	}
+	if aux.StormctrlBroadcastastRate != nil {
+		if val, err := aux.StormctrlBroadcastastRate.Int64(); err == nil {
+			dst.StormctrlBroadcastastRate = &val
+		} else if string(*aux.StormctrlBroadcastastRate) == "" {
+			var zero int64
+			dst.StormctrlBroadcastastRate = &zero
+		}
+	}
+	if aux.StormctrlMcastLevel != nil {
+		if val, err := aux.StormctrlMcastLevel.Int64(); err == nil {
+			dst.StormctrlMcastLevel = &val
+		} else if string(*aux.StormctrlMcastLevel) == "" {
+			var zero int64
+			dst.StormctrlMcastLevel = &zero
+		}
+	}
+	if aux.StormctrlMcastRate != nil {
+		if val, err := aux.StormctrlMcastRate.Int64(); err == nil {
+			dst.StormctrlMcastRate = &val
+		} else if string(*aux.StormctrlMcastRate) == "" {
+			var zero int64
+			dst.StormctrlMcastRate = &zero
+		}
+	}
+	if aux.StormctrlUcastLevel != nil {
+		if val, err := aux.StormctrlUcastLevel.Int64(); err == nil {
+			dst.StormctrlUcastLevel = &val
+		} else if string(*aux.StormctrlUcastLevel) == "" {
+			var zero int64
+			dst.StormctrlUcastLevel = &zero
+		}
+	}
+	if aux.StormctrlUcastRate != nil {
+		if val, err := aux.StormctrlUcastRate.Int64(); err == nil {
+			dst.StormctrlUcastRate = &val
+		} else if string(*aux.StormctrlUcastRate) == "" {
+			var zero int64
+			dst.StormctrlUcastRate = &zero
+		}
+	}
+	if aux.UnitID != nil {
+		if val, err := aux.UnitID.Int64(); err == nil {
+			dst.UnitID = &val
+		} else if string(*aux.UnitID) == "" {
+			var zero int64
+			dst.UnitID = &zero
+		}
+	}
+
+	return nil
+}
+
+type DevicePrecisionTimeProtocolConfig struct {
+	ClockMode              string `json:"clock_mode,omitempty"`                // boundary|sma|transparent
+	CustomAnnounceInterval *int64 `json:"custom_announce_interval,omitempty"`  // ^(-[1-4]|[0-4])$
+	CustomAnnounceTimeout  *int64 `json:"custom_announce_timeout,omitempty"`   // ^([2-9]|10)$
+	CustomDelayReqInterval *int64 `json:"custom_delay_req_interval,omitempty"` // ^(-[1-7]|[0-4])$
+	CustomDomain           *int64 `json:"custom_domain,omitempty"`             // ^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
+	CustomSyncInterval     *int64 `json:"custom_sync_interval,omitempty"`      // ^(-[1-7]|[0-4])$
+	Enabled                bool   `json:"enabled,omitempty"`
+	Priority1              *int64 `json:"priority1,omitempty"`      // ^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
+	Priority2              *int64 `json:"priority2,omitempty"`      // ^([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
+	Profile                string `json:"profile,omitempty"`        // smpte|ieee1588|aes67|aes_r16|custom
+	TransportType          string `json:"transport_type,omitempty"` // ipv4|layer2
+}
+
+func (dst *DevicePrecisionTimeProtocolConfig) UnmarshalJSON(b []byte) error {
+	type Alias DevicePrecisionTimeProtocolConfig
+	aux := &struct {
+		CustomAnnounceInterval *types.Number `json:"custom_announce_interval"`
+		CustomAnnounceTimeout  *types.Number `json:"custom_announce_timeout"`
+		CustomDelayReqInterval *types.Number `json:"custom_delay_req_interval"`
+		CustomDomain           *types.Number `json:"custom_domain"`
+		CustomSyncInterval     *types.Number `json:"custom_sync_interval"`
+		Priority1              *types.Number `json:"priority1"`
+		Priority2              *types.Number `json:"priority2"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.CustomAnnounceInterval != nil {
+		if val, err := aux.CustomAnnounceInterval.Int64(); err == nil {
+			dst.CustomAnnounceInterval = &val
+		} else if string(*aux.CustomAnnounceInterval) == "" {
+			var zero int64
+			dst.CustomAnnounceInterval = &zero
+		}
+	}
+	if aux.CustomAnnounceTimeout != nil {
+		if val, err := aux.CustomAnnounceTimeout.Int64(); err == nil {
+			dst.CustomAnnounceTimeout = &val
+		} else if string(*aux.CustomAnnounceTimeout) == "" {
+			var zero int64
+			dst.CustomAnnounceTimeout = &zero
+		}
+	}
+	if aux.CustomDelayReqInterval != nil {
+		if val, err := aux.CustomDelayReqInterval.Int64(); err == nil {
+			dst.CustomDelayReqInterval = &val
+		} else if string(*aux.CustomDelayReqInterval) == "" {
+			var zero int64
+			dst.CustomDelayReqInterval = &zero
+		}
+	}
+	if aux.CustomDomain != nil {
+		if val, err := aux.CustomDomain.Int64(); err == nil {
+			dst.CustomDomain = &val
+		} else if string(*aux.CustomDomain) == "" {
+			var zero int64
+			dst.CustomDomain = &zero
+		}
+	}
+	if aux.CustomSyncInterval != nil {
+		if val, err := aux.CustomSyncInterval.Int64(); err == nil {
+			dst.CustomSyncInterval = &val
+		} else if string(*aux.CustomSyncInterval) == "" {
+			var zero int64
+			dst.CustomSyncInterval = &zero
+		}
+	}
+	if aux.Priority1 != nil {
+		if val, err := aux.Priority1.Int64(); err == nil {
+			dst.Priority1 = &val
+		} else if string(*aux.Priority1) == "" {
+			var zero int64
+			dst.Priority1 = &zero
+		}
+	}
+	if aux.Priority2 != nil {
+		if val, err := aux.Priority2.Int64(); err == nil {
+			dst.Priority2 = &val
+		} else if string(*aux.Priority2) == "" {
+			var zero int64
+			dst.Priority2 = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceQOSMarking struct {
+	CosCode          *int64 `json:"cos_code,omitempty"`           // [0-7]
+	DscpCode         *int64 `json:"dscp_code,omitempty"`          // 0|8|16|24|32|40|48|56|10|12|14|18|20|22|26|28|30|34|36|38|44|46
+	IPPrecedenceCode *int64 `json:"ip_precedence_code,omitempty"` // [0-7]
+	Queue            *int64 `json:"queue,omitempty"`              // [0-7]
+}
+
+func (dst *DeviceQOSMarking) UnmarshalJSON(b []byte) error {
+	type Alias DeviceQOSMarking
+	aux := &struct {
+		CosCode          *types.Number `json:"cos_code"`
+		DscpCode         *types.Number `json:"dscp_code"`
+		IPPrecedenceCode *types.Number `json:"ip_precedence_code"`
+		Queue            *types.Number `json:"queue"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.CosCode != nil {
+		if val, err := aux.CosCode.Int64(); err == nil {
+			dst.CosCode = &val
+		} else if string(*aux.CosCode) == "" {
+			var zero int64
+			dst.CosCode = &zero
+		}
+	}
+	if aux.DscpCode != nil {
+		if val, err := aux.DscpCode.Int64(); err == nil {
+			dst.DscpCode = &val
+		} else if string(*aux.DscpCode) == "" {
+			var zero int64
+			dst.DscpCode = &zero
+		}
+	}
+	if aux.IPPrecedenceCode != nil {
+		if val, err := aux.IPPrecedenceCode.Int64(); err == nil {
+			dst.IPPrecedenceCode = &val
+		} else if string(*aux.IPPrecedenceCode) == "" {
+			var zero int64
+			dst.IPPrecedenceCode = &zero
+		}
+	}
+	if aux.Queue != nil {
+		if val, err := aux.Queue.Int64(); err == nil {
+			dst.Queue = &val
+		} else if string(*aux.Queue) == "" {
+			var zero int64
+			dst.Queue = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceQOSMatching struct {
+	CosCode          *int64 `json:"cos_code,omitempty"`           // [0-7]
+	DscpCode         *int64 `json:"dscp_code,omitempty"`          // [0-9]|[1-5][0-9]|6[0-3]
+	DstPort          *int64 `json:"dst_port,omitempty"`           // [0-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-5][0-9][0-9][0-9][0-9]|6[0-4][0-9][0-9][0-9]|65[0-4][0-9][0-9]|655[0-2][0-9]|6553[0-4]|65535
+	IPPrecedenceCode *int64 `json:"ip_precedence_code,omitempty"` // [0-7]
+	Protocol         string `json:"protocol,omitempty"`           // ([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])|ah|ax.25|dccp|ddp|egp|eigrp|encap|esp|etherip|fc|ggp|gre|hip|hmp|icmp|idpr-cmtp|idrp|igmp|igp|ip|ipcomp|ipencap|ipip|ipv6|ipv6-frag|ipv6-icmp|ipv6-nonxt|ipv6-opts|ipv6-route|isis|iso-tp4|l2tp|manet|mobility-header|mpls-in-ip|ospf|pim|pup|rdp|rohc|rspf|rsvp|sctp|shim6|skip|st|tcp|udp|udplite|vmtp|vrrp|wesp|xns-idp|xtp
+	SrcPort          *int64 `json:"src_port,omitempty"`           // [0-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-5][0-9][0-9][0-9][0-9]|6[0-4][0-9][0-9][0-9]|65[0-4][0-9][0-9]|655[0-2][0-9]|6553[0-4]|65535
+}
+
+func (dst *DeviceQOSMatching) UnmarshalJSON(b []byte) error {
+	type Alias DeviceQOSMatching
+	aux := &struct {
+		CosCode          *types.Number `json:"cos_code"`
+		DscpCode         *types.Number `json:"dscp_code"`
+		DstPort          *types.Number `json:"dst_port"`
+		IPPrecedenceCode *types.Number `json:"ip_precedence_code"`
+		SrcPort          *types.Number `json:"src_port"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.CosCode != nil {
+		if val, err := aux.CosCode.Int64(); err == nil {
+			dst.CosCode = &val
+		} else if string(*aux.CosCode) == "" {
+			var zero int64
+			dst.CosCode = &zero
+		}
+	}
+	if aux.DscpCode != nil {
+		if val, err := aux.DscpCode.Int64(); err == nil {
+			dst.DscpCode = &val
+		} else if string(*aux.DscpCode) == "" {
+			var zero int64
+			dst.DscpCode = &zero
+		}
+	}
+	if aux.DstPort != nil {
+		if val, err := aux.DstPort.Int64(); err == nil {
+			dst.DstPort = &val
+		} else if string(*aux.DstPort) == "" {
+			var zero int64
+			dst.DstPort = &zero
+		}
+	}
+	if aux.IPPrecedenceCode != nil {
+		if val, err := aux.IPPrecedenceCode.Int64(); err == nil {
+			dst.IPPrecedenceCode = &val
+		} else if string(*aux.IPPrecedenceCode) == "" {
+			var zero int64
+			dst.IPPrecedenceCode = &zero
+		}
+	}
+	if aux.SrcPort != nil {
+		if val, err := aux.SrcPort.Int64(); err == nil {
+			dst.SrcPort = &val
+		} else if string(*aux.SrcPort) == "" {
+			var zero int64
+			dst.SrcPort = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceQOSPolicies struct {
+	QOSMarking  *DeviceQOSMarking  `json:"qos_marking,omitempty"`
+	QOSMatching *DeviceQOSMatching `json:"qos_matching,omitempty"`
+}
+
+func (dst *DeviceQOSPolicies) UnmarshalJSON(b []byte) error {
+	type Alias DeviceQOSPolicies
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceQOSProfile struct {
+	QOSPolicies    []DeviceQOSPolicies `json:"qos_policies,omitempty"`
+	QOSProfileMode string              `json:"qos_profile_mode,omitempty"` // custom|unifi_play|aes67_audio|crestron_audio_video|dante_audio|ndi_aes67_audio|ndi_dante_audio|qsys_audio_video|qsys_video_dante_audio|sdvoe_aes67_audio|sdvoe_dante_audio|shure_audio|smpte_st2110
+}
+
+func (dst *DeviceQOSProfile) UnmarshalJSON(b []byte) error {
+	type Alias DeviceQOSProfile
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceRadioIDentifiers struct {
+	DeviceID  string `json:"device_id,omitempty"`
+	RadioName string `json:"radio_name,omitempty"`
+}
+
+func (dst *DeviceRadioIDentifiers) UnmarshalJSON(b []byte) error {
+	type Alias DeviceRadioIDentifiers
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceRadioTable struct {
+	AntennaGain           *int64                   `json:"antenna_gain,omitempty"` // ^-?([0-9]|[1-9][0-9])
+	AntennaID             *int64                   `json:"antenna_id,omitempty"`   // -1|[0-9]
+	Channel               string                   `json:"channel,omitempty"`      // [0-9]|[1][0-4]|1.5|2.5|3.5|4.5|5.5|6.5|5|16|17|21|25|29|33|34|36|37|38|40|41|42|44|45|46|48|49|52|53|56|57|60|61|64|65|69|73|77|81|85|89|93|97|100|101|104|105|108|109|112|113|117|116|120|121|124|125|128|129|132|133|136|137|140|141|144|145|149|153|157|161|165|169|173|177|181|183|184|185|187|188|189|192|193|196|197|201|205|209|213|217|221|225|229|233|auto
+	Dfs                   bool                     `json:"dfs,omitempty"`
+	HardNoiseFloorEnabled bool                     `json:"hard_noise_floor_enabled,omitempty"`
+	Ht                    *int64                   `json:"ht,omitempty"` // 20|40|80|160|240|320|1080|2160|4320
+	LoadbalanceEnabled    bool                     `json:"loadbalance_enabled,omitempty"`
+	Maxsta                *int64                   `json:"maxsta,omitempty"`   // [1-9]|[1-9][0-9]|1[0-9]{2}|200|^$
+	MinRssi               *int64                   `json:"min_rssi,omitempty"` // ^-(6[7-9]|[7-8][0-9]|90)$
+	MinRssiEnabled        bool                     `json:"min_rssi_enabled,omitempty"`
+	Name                  string                   `json:"name,omitempty"`
+	Radio                 string                   `json:"radio,omitempty"` // ng|na|ad|6e
+	RadioIDentifiers      []DeviceRadioIDentifiers `json:"radio_identifiers,omitempty"`
+	SensLevel             *int64                   `json:"sens_level,omitempty"` // ^-([5-8][0-9]|90)$
+	SensLevelEnabled      bool                     `json:"sens_level_enabled,omitempty"`
+	TxPower               string                   `json:"tx_power,omitempty"`      // [\d]+|auto
+	TxPowerMode           string                   `json:"tx_power_mode,omitempty"` // auto|medium|high|low|custom|disabled
+	VwireEnabled          bool                     `json:"vwire_enabled,omitempty"`
+}
+
+func (dst *DeviceRadioTable) UnmarshalJSON(b []byte) error {
+	type Alias DeviceRadioTable
+	aux := &struct {
+		AntennaGain *types.Number `json:"antenna_gain"`
+		AntennaID   *types.Number `json:"antenna_id"`
+		Channel     types.Number  `json:"channel"`
+		Ht          *types.Number `json:"ht"`
+		Maxsta      *types.Number `json:"maxsta"`
+		MinRssi     *types.Number `json:"min_rssi"`
+		SensLevel   *types.Number `json:"sens_level"`
+		TxPower     types.Number  `json:"tx_power"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.AntennaGain != nil {
+		if val, err := aux.AntennaGain.Int64(); err == nil {
+			dst.AntennaGain = &val
+		} else if string(*aux.AntennaGain) == "" {
+			var zero int64
+			dst.AntennaGain = &zero
+		}
+	}
+	if aux.AntennaID != nil {
+		if val, err := aux.AntennaID.Int64(); err == nil {
+			dst.AntennaID = &val
+		} else if string(*aux.AntennaID) == "" {
+			var zero int64
+			dst.AntennaID = &zero
+		}
+	}
+	dst.Channel = aux.Channel.String()
+	dst.Ht = types.ToInt64Pointer(aux.Ht)
+	if aux.Maxsta != nil {
+		if val, err := aux.Maxsta.Int64(); err == nil {
+			dst.Maxsta = &val
+		} else if string(*aux.Maxsta) == "" {
+			// "" means unset; 0 is not a valid value for this field.
+			dst.Maxsta = nil
+		}
+	}
+	if aux.MinRssi != nil {
+		if val, err := aux.MinRssi.Int64(); err == nil {
+			dst.MinRssi = &val
+		} else if string(*aux.MinRssi) == "" {
+			var zero int64
+			dst.MinRssi = &zero
+		}
+	}
+	if aux.SensLevel != nil {
+		if val, err := aux.SensLevel.Int64(); err == nil {
+			dst.SensLevel = &val
+		} else if string(*aux.SensLevel) == "" {
+			var zero int64
+			dst.SensLevel = &zero
+		}
+	}
+	dst.TxPower = aux.TxPower.String()
+
+	return nil
+}
+
+type DeviceRpsOverride struct {
+	PowerManagementMode string               `json:"power_management_mode,omitempty"` // dynamic|static
+	RpsPortTable        []DeviceRpsPortTable `json:"rps_port_table,omitempty"`
+}
+
+func (dst *DeviceRpsOverride) UnmarshalJSON(b []byte) error {
+	type Alias DeviceRpsOverride
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceRpsPortTable struct {
+	Name     string `json:"name,omitempty"`      // .{0,32}
+	PortIDX  *int64 `json:"port_idx,omitempty"`  // [1-8]
+	PortMode string `json:"port_mode,omitempty"` // auto|force_active|manual|disabled
+}
+
+func (dst *DeviceRpsPortTable) UnmarshalJSON(b []byte) error {
+	type Alias DeviceRpsPortTable
+	aux := &struct {
+		PortIDX *types.Number `json:"port_idx"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.PortIDX != nil {
+		if val, err := aux.PortIDX.Int64(); err == nil {
+			dst.PortIDX = &val
+		} else if string(*aux.PortIDX) == "" {
+			var zero int64
+			dst.PortIDX = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceSim struct {
+	CurrentApn               *DeviceCurrentApn `json:"current_apn,omitempty"`
+	DataHardLimitBytes       *int64            `json:"data_hard_limit_bytes,omitempty"`
+	DataLimitEnabled         bool              `json:"data_limit_enabled,omitempty"`
+	DataSoftLimitBytes       *int64            `json:"data_soft_limit_bytes,omitempty"`
+	DataSoftLimitDisplayUnit string            `json:"data_soft_limit_display_unit,omitempty"` // MB|GB
+	DataWarningThreshold     *int64            `json:"data_warning_threshold,omitempty"`       // [0-9]|[1-9][0-9]|100
+	ResetDate                *int64            `json:"reset_date,omitempty"`                   // [0-9]|[1-2][0-9]|3[0-1]
+	ResetPolicy              string            `json:"reset_policy,omitempty"`                 // day|week|month
+	Slot                     *int64            `json:"slot,omitempty"`                         // 1|2
+	UseCustomApn             bool              `json:"use_custom_apn,omitempty"`
+}
+
+func (dst *DeviceSim) UnmarshalJSON(b []byte) error {
+	type Alias DeviceSim
+	aux := &struct {
+		DataHardLimitBytes   *types.Number `json:"data_hard_limit_bytes"`
+		DataSoftLimitBytes   *types.Number `json:"data_soft_limit_bytes"`
+		DataWarningThreshold *types.Number `json:"data_warning_threshold"`
+		ResetDate            *types.Number `json:"reset_date"`
+		Slot                 *types.Number `json:"slot"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.DataHardLimitBytes != nil {
+		if val, err := aux.DataHardLimitBytes.Int64(); err == nil {
+			dst.DataHardLimitBytes = &val
+		} else if string(*aux.DataHardLimitBytes) == "" {
+			var zero int64
+			dst.DataHardLimitBytes = &zero
+		}
+	}
+	if aux.DataSoftLimitBytes != nil {
+		if val, err := aux.DataSoftLimitBytes.Int64(); err == nil {
+			dst.DataSoftLimitBytes = &val
+		} else if string(*aux.DataSoftLimitBytes) == "" {
+			var zero int64
+			dst.DataSoftLimitBytes = &zero
+		}
+	}
+	if aux.DataWarningThreshold != nil {
+		if val, err := aux.DataWarningThreshold.Int64(); err == nil {
+			dst.DataWarningThreshold = &val
+		} else if string(*aux.DataWarningThreshold) == "" {
+			var zero int64
+			dst.DataWarningThreshold = &zero
+		}
+	}
+	if aux.ResetDate != nil {
+		if val, err := aux.ResetDate.Int64(); err == nil {
+			dst.ResetDate = &val
+		} else if string(*aux.ResetDate) == "" {
+			var zero int64
+			dst.ResetDate = &zero
+		}
+	}
+	if aux.Slot != nil {
+		if val, err := aux.Slot.Int64(); err == nil {
+			dst.Slot = &val
+		} else if string(*aux.Slot) == "" {
+			var zero int64
+			dst.Slot = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceSmaPortConfig struct {
+	ClockSource string  `json:"clock_source,omitempty"` // gps|external
+	DelayNs     float64 `json:"delay_ns,omitempty"`
+	Display     string  `json:"display,omitempty"` // ns|m|ft
+}
+
+func (dst *DeviceSmaPortConfig) UnmarshalJSON(b []byte) error {
+	type Alias DeviceSmaPortConfig
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+
+	return nil
+}
+
+type DeviceVbmsOverride struct {
+	EpoEnabled    bool   `json:"epo_enabled,omitempty"`
+	InputThdLevel *int64 `json:"input_thd_level,omitempty"` // [0-2]
+}
+
+func (dst *DeviceVbmsOverride) UnmarshalJSON(b []byte) error {
+	type Alias DeviceVbmsOverride
+	aux := &struct {
+		InputThdLevel *types.Number `json:"input_thd_level"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.InputThdLevel != nil {
+		if val, err := aux.InputThdLevel.Int64(); err == nil {
+			dst.InputThdLevel = &val
+		} else if string(*aux.InputThdLevel) == "" {
+			var zero int64
+			dst.InputThdLevel = &zero
+		}
+	}
+
+	return nil
+}
+
+type DeviceVideoInfo struct {
+	AudioEnabled  bool   `json:"audio_enabled,omitempty"`
+	AudioMode     string `json:"audio_mode,omitempty"`   // auto|pcm
+	Channel       *int64 `json:"channel,omitempty"`      // [2-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]
+	ColorFormat   string `json:"color_format,omitempty"` // rgb|ycbcr444|ycbcr422
+	Mode          string `json:"mode,omitempty"`         // unicast|multicast
+	RefreshRate   string `json:"refresh_rate,omitempty"`
+	Resolution    string `json:"resolution,omitempty"`      // auto|1080p|1440p|4k
+	Role          string `json:"role,omitempty"`            // host|client
+	TvwallEndX    *int64 `json:"tvwall_end_x,omitempty"`    // [2-5]
+	TvwallEndY    *int64 `json:"tvwall_end_y,omitempty"`    // [2-5]
+	TvwallLayoutX *int64 `json:"tvwall_layout_x,omitempty"` // [1-4]
+	TvwallLayoutY *int64 `json:"tvwall_layout_y,omitempty"` // [1-4]
+	TvwallStartX  *int64 `json:"tvwall_start_x,omitempty"`  // [2-5]
+	TvwallStartY  *int64 `json:"tvwall_start_y,omitempty"`  // [2-5]
+}
+
+func (dst *DeviceVideoInfo) UnmarshalJSON(b []byte) error {
+	type Alias DeviceVideoInfo
+	aux := &struct {
+		Channel       *types.Number `json:"channel"`
+		TvwallEndX    *types.Number `json:"tvwall_end_x"`
+		TvwallEndY    *types.Number `json:"tvwall_end_y"`
+		TvwallLayoutX *types.Number `json:"tvwall_layout_x"`
+		TvwallLayoutY *types.Number `json:"tvwall_layout_y"`
+		TvwallStartX  *types.Number `json:"tvwall_start_x"`
+		TvwallStartY  *types.Number `json:"tvwall_start_y"`
+
+		*Alias
+	}{
+		Alias: (*Alias)(dst),
+	}
+
+	err := json.Unmarshal(b, &aux)
+	if err != nil {
+		return fmt.Errorf("unable to unmarshal alias: %w", err)
+	}
+	if aux.Channel != nil {
+		if val, err := aux.Channel.Int64(); err == nil {
+			dst.Channel = &val
+		} else if string(*aux.Channel) == "" {
+			var zero int64
+			dst.Channel = &zero
+		}
+	}
+	if aux.TvwallEndX != nil {
+		if val, err := aux.TvwallEndX.Int64(); err == nil {
+			dst.TvwallEndX = &val
+		} else if string(*aux.TvwallEndX) == "" {
+			var zero int64
+			dst.TvwallEndX = &zero
+		}
+	}
+	if aux.TvwallEndY != nil {
+		if val, err := aux.TvwallEndY.Int64(); err == nil {
+			dst.TvwallEndY = &val
+		} else if string(*aux.TvwallEndY) == "" {
+			var zero int64
+			dst.TvwallEndY = &zero
+		}
+	}
+	if aux.TvwallLayoutX != nil {
+		if val, err := aux.TvwallLayoutX.Int64(); err == nil {
+			dst.TvwallLayoutX = &val
+		} else if string(*aux.TvwallLayoutX) == "" {
+			var zero int64
+			dst.TvwallLayoutX = &zero
+		}
+	}
+	if aux.TvwallLayoutY != nil {
+		if val, err := aux.TvwallLayoutY.Int64(); err == nil {
+			dst.TvwallLayoutY = &val
+		} else if string(*aux.TvwallLayoutY) == "" {
+			var zero int64
+			dst.TvwallLayoutY = &zero
+		}
+	}
+	if aux.TvwallStartX != nil {
+		if val, err := aux.TvwallStartX.Int64(); err == nil {
+			dst.TvwallStartX = &val
+		} else if string(*aux.TvwallStartX) == "" {
+			var zero int64
+			dst.TvwallStartX = &zero
+		}
+	}
+	if aux.TvwallStartY != nil {
+		if val, err := aux.TvwallStartY.Int64(); err == nil {
+			dst.TvwallStartY = &val
+		} else if string(*aux.TvwallStartY) == "" {
+			var zero int64
+			dst.TvwallStartY = &zero
+		}
+	}
+
+	return nil
+}
+
+func (c *ApiClient) listDevice(
+	ctx context.Context,
+	site string,
+	query ...map[string]string,
+) ([]Device, error) {
+	var respBody struct {
+		Meta meta     `json:"meta"`
+		Data []Device `json:"data"`
+	}
+
+	err := c.do(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("api/s/%s/stat/device", site),
+		nil,
+		&respBody,
+		query...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return respBody.Data, nil
+}
+
+func (c *ApiClient) getDevice(
+	ctx context.Context,
+	site string,
+	id string,
+) (*Device, error) {
+	var respBody struct {
+		Meta meta     `json:"meta"`
+		Data []Device `json:"data"`
+	}
+	err := c.do(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("api/s/%s/stat/device/%s", site, id),
+		nil,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(respBody.Data) != 1 {
+		return nil, &NotFoundError{}
+	}
+
+	d := respBody.Data[0]
+	return &d, nil
+}
+
+func (c *ApiClient) deleteDevice(
+	ctx context.Context,
+	site string,
+	id string,
+) error {
+	err := c.do(
+		ctx,
+		http.MethodDelete,
+		fmt.Sprintf("api/s/%s/stat/device/%s", site, id),
+		struct{}{},
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *ApiClient) createDevice(
+	ctx context.Context,
+	site string,
+	d *Device,
+) (*Device, error) {
+	var respBody struct {
+		Meta meta     `json:"meta"`
+		Data []Device `json:"data"`
+	}
+
+	err := c.do(
+		ctx,
+		http.MethodPost,
+		fmt.Sprintf("api/s/%s/stat/device", site),
+		d,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(respBody.Data) != 1 {
+		return nil, &NotFoundError{}
+	}
+
+	res := respBody.Data[0]
+
+	return &res, nil
+}
+
+func (c *ApiClient) updateDevice(
+	ctx context.Context,
+	site string,
+	d *Device,
+) (*Device, error) {
+	var respBody struct {
+		Meta meta     `json:"meta"`
+		Data []Device `json:"data"`
+	}
+	err := c.do(
+		ctx,
+		http.MethodPut,
+		fmt.Sprintf("api/s/%s/rest/device/%s", site, d.ID),
+		d,
+		&respBody,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// UDM SE API returns empty data array on successful PUT.
+	// In that case, fetch the updated resource via GET.
+	if len(respBody.Data) == 0 {
+		return c.getDevice(ctx, site, d.ID)
+	}
+
+	if len(respBody.Data) != 1 {
+		return nil, &NotFoundError{}
+	}
+
+	res := respBody.Data[0]
+
+	return &res, nil
+}
