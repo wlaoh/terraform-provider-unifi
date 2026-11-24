@@ -94,11 +94,15 @@ func New(ctx context.Context, cfg *Config) (*ApiClient, error) {
 		c.RetryMax = *cfg.RetryMax
 	}
 
-	// Login 429s are surfaced as RateLimitError (see doRequest) so loginWithRetry
-	// can honor Retry-After with a login-specific budget. All other requests let
-	// the transport retry 429 itself — retryablehttp's DefaultBackoff honors
-	// Retry-After — because with API-key auth there is no login step, and a
-	// single controller rate-limit hit would otherwise fail the whole run.
+	client := &ApiClient{
+		c:        c,
+		apiKey:   cfg.APIKey,
+		username: cfg.Username,
+		password: cfg.Password,
+	}
+
+	// Login has its own retry budget. Other 429s signal every reader sharing
+	// this controller connection, including when the caller is out of retries.
 	c.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
 		if resp != nil && resp.StatusCode == http.StatusTooManyRequests {
 			if resp.Request != nil &&
@@ -106,9 +110,21 @@ func New(ctx context.Context, cfg *Config) (*ApiClient, error) {
 					strings.HasSuffix(resp.Request.URL.Path, loginPathNew)) {
 				return false, nil
 			}
+			client.readCooldown.extend(readRetryDelay(c.RetryWaitMin, c.RetryWaitMax, 0, resp))
 			return true, nil
 		}
 		return retryablehttp.DefaultRetryPolicy(ctx, resp, err)
+	}
+
+	c.PrepareRetry = client.readCooldown.beforeRead
+	c.Backoff = func(minWait, maxWait time.Duration, attempt int, resp *http.Response) time.Duration {
+		if resp != nil && resp.StatusCode == http.StatusTooManyRequests &&
+			resp.Request != nil && isReadMethod(resp.Request.Method) {
+			delay := readRetryDelay(minWait, maxWait, attempt, resp)
+			client.readCooldown.extend(delay)
+			return delay
+		}
+		return retryablehttp.DefaultBackoff(minWait, maxWait, attempt, resp)
 	}
 
 	// When the retry budget is spent on a retryable status (429, 5xx), hand the
@@ -141,13 +157,6 @@ func New(ctx context.Context, cfg *Config) (*ApiClient, error) {
 
 	jar, _ := cookiejar.New(nil)
 	c.HTTPClient.Jar = jar
-
-	client := &ApiClient{
-		c:        c,
-		apiKey:   cfg.APIKey,
-		username: cfg.Username,
-		password: cfg.Password,
-	}
 
 	if cfg.CloudConnector {
 		client.baseURL, _ = url.Parse("https://api.ui.com")
@@ -182,7 +191,8 @@ func New(ctx context.Context, cfg *Config) (*ApiClient, error) {
 }
 
 type ApiClient struct {
-	loginMu sync.RWMutex // serializes non-apiKey requests for CSRF token propagation
+	readCooldown readCooldown
+	loginMu      sync.RWMutex // serializes non-apiKey requests for CSRF token propagation
 
 	c       *retryablehttp.Client
 	baseURL *url.URL
@@ -747,6 +757,9 @@ func (c *ApiClient) doRequest(
 		req.Header.Set("X-Csrf-Token", csrfToken)
 	}
 
+	if err := c.readCooldown.beforeRead(req.Request); err != nil {
+		return err
+	}
 	resp, err := c.c.Do(req)
 	if err != nil {
 		return fmt.Errorf("unable to perform request: %s %s %w", method, relativeURL, err)
@@ -763,11 +776,10 @@ func (c *ApiClient) doRequest(
 		}
 	}
 
-	// Surface controller rate-limiting (HTTP 429) as a typed error so callers
-	// (notably login) can back off honoring Retry-After instead of failing with
-	// an opaque error. The transport is configured not to retry 429 itself.
+	// Preserve the controller's delay for login and for callers that exhaust their retry budget.
 	if resp.StatusCode == http.StatusTooManyRequests {
-		return &RateLimitError{RetryAfter: parseRetryAfter(resp)}
+		delay, _ := parseRetryAfter(resp)
+		return &RateLimitError{RetryAfter: delay}
 	}
 
 	c.csrfMu.Lock()
@@ -893,31 +905,6 @@ func nonJSONErrorMessage(body []byte) string {
 		s = s[:maxLen] + "..."
 	}
 	return s
-}
-
-// parseRetryAfter reads the Retry-After header from a 429 response, supporting
-// both the delta-seconds form ("120") and the HTTP-date form. Returns 0 when the
-// header is absent or unparseable.
-func parseRetryAfter(resp *http.Response) time.Duration {
-	if resp == nil {
-		return 0
-	}
-	v := resp.Header.Get("Retry-After")
-	if v == "" {
-		return 0
-	}
-	if secs, err := strconv.Atoi(v); err == nil {
-		if secs <= 0 {
-			return 0
-		}
-		return time.Duration(secs) * time.Second
-	}
-	if t, err := http.ParseTime(v); err == nil {
-		if d := time.Until(t); d > 0 {
-			return d
-		}
-	}
-	return 0
 }
 
 func Ptr[T any](in T) *T {

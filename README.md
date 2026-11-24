@@ -6,6 +6,8 @@
 
 This fork builds with a local copy of the `go-unifi` SDK. Its [provenance and update instructions](third_party/go-unifi/README.md) describe how to keep the provider's controller changes when updating the SDK.
 
+Concurrent API reads share the controller’s rate-limit cooldown within each configured provider client. A 429 response delays new reads and read retries. The delay follows `Retry-After` or exponential backoff, capped at 30 seconds per signal. The configured retry count still applies.
+
 ## Documentation
 
 Use the [documentation in this checkout](docs/index.md) for the fork's [resources](docs/resources) and [data sources](docs/data-sources). The Terraform Registry documents the [published upstream provider](https://registry.terraform.io/providers/ubiquiti-community/unifi/latest/docs).
