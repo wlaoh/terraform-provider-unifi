@@ -107,7 +107,7 @@ resource "unifi_vpn_client" "wireguard_with_psk" {
 
 - `name` (String) The name of the VPN client.
 - `subnet` (String) The local IP address for the WireGuard tunnel in CIDR notation (e.g., `10.0.0.2/24`).
-- `wireguard` (Attributes) WireGuard VPN configuration. Specify either `configuration` for file upload mode or `peer` for manual configuration. (see [below for nested schema](#nestedatt--wireguard))
+- `wireguard` (Attributes) WireGuard VPN configuration. Specify either `configuration` for a single-peer file or `peer` for explicit settings. (see [below for nested schema](#nestedatt--wireguard))
 
 ### Optional
 
@@ -127,7 +127,7 @@ resource "unifi_vpn_client" "wireguard_with_psk" {
 
 Optional:
 
-- `configuration` (Attributes) File-based WireGuard configuration. Provide a complete WireGuard .conf file. (see [below for nested schema](#nestedatt--wireguard--configuration))
+- `configuration` (Attributes) Single-peer WireGuard configuration translated to UniFi manual client settings. The manual client API cannot enforce AllowedIPs from a file. A file containing AllowedIPs requires a different management method for those selectors. (see [below for nested schema](#nestedatt--wireguard--configuration))
 - `dns_servers` (List of String) DNS servers for the WireGuard interface. Required for manual mode. Must specify 1-2 DNS server addresses.
 - `interface` (String) WAN interface to use for the VPN connection (e.g., `wan`, `wan2`). Defaults to `wan` for a new client; an existing client keeps the controller's value when this is not set, so adopting a tunnel on `wan2` does not move it (#544).
 - `peer` (Attributes) Manual WireGuard peer configuration. Specify peer endpoint and public key. (see [below for nested schema](#nestedatt--wireguard--peer))

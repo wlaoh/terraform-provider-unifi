@@ -2,11 +2,16 @@ package unifi
 
 import (
 	"bufio"
+	"context"
 	"encoding/base64"
 	"fmt"
+	"net"
 	"net/netip"
+	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 // wireguardConfigParsed contains the parsed fields from a WireGuard .conf file.
@@ -30,19 +35,27 @@ type wireguardConfigParsed struct {
 func parseWireGuardConfig(content string) (*wireguardConfigParsed, error) {
 	result := &wireguardConfigParsed{}
 	var section string
+	seenPeer := false
 
 	scanner := bufio.NewScanner(strings.NewReader(content))
 	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
+		text, _, _ := strings.Cut(scanner.Text(), "#")
+		line := strings.TrimSpace(text)
 
 		// Skip empty lines and comments
-		if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
+		if line == "" || strings.HasPrefix(line, ";") {
 			continue
 		}
 
 		// Section headers
 		if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
-			section = strings.ToLower(strings.Trim(line, "[]"))
+			section = strings.ToLower(line[1 : len(line)-1])
+			if section == "peer" {
+				if seenPeer {
+					return nil, fmt.Errorf("UniFi VPN clients support exactly one WireGuard peer")
+				}
+				seenPeer = true
+			}
 			continue
 		}
 
@@ -76,11 +89,16 @@ func parseWireGuardConfig(content string) (*wireguardConfigParsed, error) {
 				result.PublicKey = value
 			case "endpoint":
 				result.Endpoint = value
-				if ip, port, err := parseEndpoint(value); err == nil {
-					result.EndpointIP = ip
-					result.EndpointPort = port
+				host, port, err := parseEndpoint(value)
+				if err != nil {
+					return nil, err
 				}
+				result.EndpointIP = host
+				result.EndpointPort = port
 			case "allowedips":
+				if value == "" {
+					return nil, fmt.Errorf("WireGuard AllowedIPs cannot be empty")
+				}
 				result.AllowedIPs = value
 			case "presharedkey":
 				result.PresharedKey = value
@@ -103,27 +121,52 @@ func parseWireGuardConfig(content string) (*wireguardConfigParsed, error) {
 	return result, nil
 }
 
-// parseEndpoint extracts IP and port from a WireGuard endpoint string (e.g., "192.0.2.1:51820").
+var wireguardEndpointHostname = regexp.MustCompile(`(?i)^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.?$`)
+
 func parseEndpoint(endpoint string) (string, int64, error) {
-	lastColon := strings.LastIndex(endpoint, ":")
-	if lastColon < 0 {
-		return "", 0, fmt.Errorf("invalid endpoint format: %s", endpoint)
+	host, portText, err := net.SplitHostPort(endpoint)
+	if err != nil || host == "" {
+		return "", 0, fmt.Errorf("WireGuard Endpoint must be a host and port; enclose IPv6 addresses in brackets")
 	}
-
-	ip := endpoint[:lastColon]
-	portStr := endpoint[lastColon+1:]
-
-	// Handle IPv6 addresses in brackets
-	if strings.HasPrefix(ip, "[") && strings.HasSuffix(ip, "]") {
-		ip = ip[1 : len(ip)-1]
+	if _, err := netip.ParseAddr(host); err != nil && (len(host) > 253 || !wireguardEndpointHostname.MatchString(host)) {
+		return "", 0, fmt.Errorf("WireGuard Endpoint must have a valid IP address or DNS hostname")
 	}
+	port, err := strconv.ParseUint(portText, 10, 16)
+	if err != nil || port == 0 {
+		return "", 0, fmt.Errorf("WireGuard Endpoint port must be an integer from 1 to 65535")
+	}
+	return host, int64(port), nil
+}
 
-	port, err := strconv.ParseInt(portStr, 10, 64)
+// UniFi's manual WireGuard client endpoint has no peer selector field.
+func parseUniFiWireGuardFile(content string) (*wireguardConfigParsed, error) {
+	config, err := parseWireGuardBase64Config(content)
 	if err != nil {
-		return "", 0, fmt.Errorf("invalid port in endpoint %s: %w", endpoint, err)
+		return nil, err
 	}
+	if config.AllowedIPs != "" {
+		return nil, fmt.Errorf("the UniFi manual VPN client API cannot preserve WireGuard AllowedIPs; use a method that enforces your peer selectors before omitting this directive")
+	}
+	return config, nil
+}
 
-	return ip, port, nil
+type wireguardFileValidator struct{}
+
+func (wireguardFileValidator) Description(context.Context) string {
+	return "Requires a base64-encoded single-peer WireGuard configuration supported by the UniFi client."
+}
+
+func (v wireguardFileValidator) MarkdownDescription(ctx context.Context) string {
+	return v.Description(ctx)
+}
+
+func (wireguardFileValidator) ValidateString(_ context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
+		return
+	}
+	if _, err := parseUniFiWireGuardFile(req.ConfigValue.ValueString()); err != nil {
+		resp.Diagnostics.AddAttributeError(req.Path, "Invalid WireGuard Configuration File", err.Error())
+	}
 }
 
 // parseWireGuardBase64Config decodes and parses a base64-encoded WireGuard config.

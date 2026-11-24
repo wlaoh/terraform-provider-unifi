@@ -355,3 +355,30 @@ func TestIPv6FromAddress(t *testing.T) {
 		}
 	}
 }
+
+func TestUniFiWireGuardFileValidation(t *testing.T) {
+	const body = "[Interface]\nAddress = 10.0.0.1/24\n[Peer]\nPublicKey = dummy-fixture\n"
+	for _, tc := range []struct {
+		name, peer string
+		valid      bool
+	}{
+		{"hostname", "Endpoint = vpn.example.test:51820 # public endpoint", true},
+		{"IPv6", "Endpoint = [2001:db8::1]:65535", true},
+		{"multiple peers", "Endpoint = host:51820\n[Peer]\nEndpoint = other:51820", false},
+		{"restricted peer", "Endpoint = host:51820\nAllowedIPs = 10.0.0.0/24", false},
+		{"default route selector", "Endpoint = host:51820\nAllowedIPs = 0.0.0.0/0", false},
+		{"empty host", "Endpoint = :51820", false},
+		{"missing port", "Endpoint = host", false},
+		{"invalid port", "Endpoint = host:abc", false},
+		{"out of range port", "Endpoint = host:65536", false},
+		{"invalid hostname", "Endpoint = host.example/path:80", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			in := base64.StdEncoding.EncodeToString([]byte(body + tc.peer))
+			_, err := parseUniFiWireGuardFile(in)
+			if (err == nil) != tc.valid {
+				t.Fatalf("valid=%t, error=%v", tc.valid, err)
+			}
+		})
+	}
+}

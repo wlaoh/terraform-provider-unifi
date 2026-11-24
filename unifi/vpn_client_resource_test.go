@@ -228,7 +228,7 @@ resource "unifi_vpn_client" "test" {
     interface   = "wan"
 
     configuration = {
-      content  = "W0ludGVyZmFjZV0KUHJpdmF0ZUtleSA9IFdQaUJhL0FrMVcrOFNwOEw1eXZieWhIZVJPMm81a0p2aWhxMlZ0SitrRmc9CkFkZHJlc3MgPSAxMC4wLjAuMi8yNApETlMgPSA4LjguOC44LCA4LjguNC40CgpbUGVlcl0KUHVibGljS2V5ID0gN0IrMlozb2RQYkROc2ZWcitGOGludmo2L21CS0xWYW9sT0hYWm9DYUJBMD0KRW5kcG9pbnQgPSAxOTIuMC4yLjE6NTE4MjAKQWxsb3dlZElQcyA9IDAuMC4wLjAvMAo="
+      content  = "W0ludGVyZmFjZV0KUHJpdmF0ZUtleSA9IFdQaUJhL0FrMVcrOFNwOEw1eXZieWhIZVJPMm81a0p2aWhxMlZ0SitrRmc9CkFkZHJlc3MgPSAxMC4wLjAuMi8yNApETlMgPSA4LjguOC44LCA4LjguNC40CgpbUGVlcl0KUHVibGljS2V5ID0gN0IrMlozb2RQYkROc2ZWcitGOGludmo2L21CS0xWYW9sT0hYWm9DYUJBMD0KRW5kcG9pbnQgPSAxOTIuMC4yLjE6NTE4MjAK"
       filename = "wireguard.conf"
     }
   }
@@ -944,7 +944,7 @@ func Test_vpnClientResource_ipv6Subnet(t *testing.T) {
 	r := &vpnClientResource{}
 
 	conf := "[Interface]\nPrivateKey = privkey==\nAddress = 10.0.0.2/30, 2001:db8::2/64\n\n" +
-		"[Peer]\nPublicKey = pubkey==\nEndpoint = 192.0.2.1:51820\nAllowedIPs = ::/0\n"
+		"[Peer]\nPublicKey = pubkey==\nEndpoint = 192.0.2.1:51820\n"
 
 	fileModeModel := func(t *testing.T, ipv6 cidrtypes.IPv6Prefix) *vpnClientResourceModel {
 		t.Helper()

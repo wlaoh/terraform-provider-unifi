@@ -826,6 +826,11 @@ func (r *siteToSiteVPNResource) Read(
 		return
 	}
 
+	if err := siteVPNNetwork.validate(network); err != nil {
+		resp.Diagnostics.AddError("Unexpected Network Type", err.Error())
+		return
+	}
+
 	resp.Diagnostics.Append(r.networkToModel(ctx, network, &data, site)...)
 	// Terraform rejects any modification of an existing stored identity
 	// (including filling a null attribute), so pass an incoming identity
@@ -873,6 +878,11 @@ func (r *siteToSiteVPNResource) Update(
 
 	site := r.siteOrDefault(data.Site)
 
+	if err := r.client.checkNetworkKind(ctx, site, network.ID, siteVPNNetwork); err != nil {
+		resp.Diagnostics.AddError("Cannot Verify Network Type Before Update", err.Error())
+		return
+	}
+
 	updated, err := r.client.UpdateNetwork(ctx, site, network)
 	if err != nil {
 		resp.Diagnostics.AddError("Error Updating Site-to-Site VPN", err.Error())
@@ -916,7 +926,7 @@ func (r *siteToSiteVPNResource) Delete(
 
 	site := r.siteOrDefault(data.Site)
 
-	err := r.client.DeleteNetwork(ctx, site, data.ID.ValueString(), data.Name.ValueString())
+	err := r.client.deleteManagedNetwork(ctx, site, data.ID.ValueString(), data.Name.ValueString(), siteVPNNetwork)
 	if err != nil {
 		if _, ok := err.(*unifi.NotFoundError); ok {
 			return
@@ -1304,8 +1314,7 @@ func (r *siteToSiteVPNResource) List(
 	stream.Results = func(push func(list.ListResult) bool) {
 		for _, network := range networks {
 			// Filter to only site-to-site IPsec VPN networks.
-			if network.Purpose != unifi.PurposeSiteVPN ||
-				network.VPNType == nil || *network.VPNType != "ipsec-vpn" {
+			if !siteVPNNetwork.matches(&network) {
 				continue
 			}
 

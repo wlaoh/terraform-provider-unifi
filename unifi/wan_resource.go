@@ -1463,6 +1463,11 @@ func (r *wanResource) Read(
 		}
 	}
 
+	if err := wanNetwork.validate(network); err != nil {
+		resp.Diagnostics.AddError("Unexpected Network Type", err.Error())
+		return
+	}
+
 	// Convert to model
 	diags := r.networkToModel(ctx, network, &state, site)
 	resp.Diagnostics.Append(diags...)
@@ -1566,6 +1571,11 @@ func (r *wanResource) Update(
 		return
 	}
 
+	if err := r.client.checkNetworkKind(ctx, site, id, wanNetwork); err != nil {
+		resp.Diagnostics.AddError("Cannot Verify Network Type Before Update", err.Error())
+		return
+	}
+
 	updatedNetwork, err := r.client.UpdateNetworkPatch(ctx, site, id, patch)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -1632,7 +1642,7 @@ func (r *wanResource) Delete(
 	// Delete the network
 	networkName := state.Name.ValueString()
 	networkID := state.ID.ValueString()
-	err := r.client.DeleteNetwork(ctx, site, networkID, networkName)
+	err := r.client.deleteManagedNetwork(ctx, site, networkID, networkName, wanNetwork)
 	if err != nil {
 		// WAN networks cannot be deleted from the controller; removing from state only.
 		if strings.Contains(err.Error(), "NoDelete") {
@@ -2531,7 +2541,7 @@ func (r *wanResource) List(
 	stream.Results = func(push func(list.ListResult) bool) {
 		for _, network := range networks {
 			// Filter to only WAN networks.
-			if network.Purpose != unifi.PurposeWAN || network.WANNetworkGroup == nil {
+			if !wanNetwork.matches(&network) || network.WANNetworkGroup == nil {
 				continue
 			}
 

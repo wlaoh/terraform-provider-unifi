@@ -1813,6 +1813,11 @@ func (r *networkResource) Read(
 		}
 	}
 
+	if err := lanNetwork.validate(network); err != nil {
+		resp.Diagnostics.AddError("Unexpected Network Type", err.Error())
+		return
+	}
+
 	// Convert to model, passing the current state to preserve null values
 	var priorState networkResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &priorState)...)
@@ -1970,6 +1975,11 @@ func (r *networkResource) Update(
 		}
 	}
 
+	if err := r.client.checkNetworkKind(ctx, site, id, lanNetwork); err != nil {
+		resp.Diagnostics.AddError("Cannot Verify Network Type Before Update", err.Error())
+		return
+	}
+
 	updatedNetwork, err := r.client.UpdateNetworkPatch(ctx, site, id, patch)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -2032,7 +2042,7 @@ func (r *networkResource) Delete(
 
 	// Delete the network
 	name := data.Name.ValueString()
-	err := r.client.DeleteNetwork(ctx, site, data.ID.ValueString(), name)
+	err := r.client.deleteManagedNetwork(ctx, site, data.ID.ValueString(), name, lanNetwork)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting network",
@@ -3314,9 +3324,7 @@ func (r *networkResource) List(
 	stream.Results = func(push func(list.ListResult) bool) {
 		for _, network := range networks {
 			// Filter by purpose: only corporate, guest and vlan-only networks.
-			if network.Purpose != unifi.PurposeCorporate &&
-				network.Purpose != unifi.PurposeGuest &&
-				network.Purpose != unifi.PurposeVLANOnly {
+			if !lanNetwork.matches(&network) {
 				continue
 			}
 

@@ -846,6 +846,11 @@ func (r *vpnServerResource) Read(
 		}
 	}
 
+	if err := vpnServerNetwork.validate(network); err != nil {
+		resp.Diagnostics.AddError("Unexpected Network Type", err.Error())
+		return
+	}
+
 	var priorState vpnServerResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &priorState)...)
 	if resp.Diagnostics.HasError() {
@@ -925,6 +930,11 @@ func (r *vpnServerResource) Update(
 		return
 	}
 
+	if err := r.client.checkNetworkKind(ctx, site, network.ID, vpnServerNetwork); err != nil {
+		resp.Diagnostics.AddError("Cannot Verify Network Type Before Update", err.Error())
+		return
+	}
+
 	updatedNetwork, err := r.client.UpdateNetwork(ctx, site, network)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -981,7 +991,7 @@ func (r *vpnServerResource) Delete(
 	}
 
 	name := data.Name.ValueString()
-	err := r.client.DeleteNetwork(ctx, site, data.ID.ValueString(), name)
+	err := r.client.deleteManagedNetwork(ctx, site, data.ID.ValueString(), name, vpnServerNetwork)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting VPN Server",
@@ -1530,7 +1540,7 @@ func (r *vpnServerResource) List(
 	stream.Results = func(push func(list.ListResult) bool) {
 		for _, network := range networks {
 			// Filter by purpose: only remote-user-vpn networks.
-			if network.Purpose != unifi.PurposeUserVPN {
+			if !vpnServerNetwork.matches(&network) {
 				continue
 			}
 

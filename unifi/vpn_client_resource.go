@@ -260,7 +260,7 @@ func (r *vpnClientResource) Schema(
 				},
 			},
 			"wireguard": schema.SingleNestedAttribute{
-				MarkdownDescription: "WireGuard VPN configuration. Specify either `configuration` for file upload mode or `peer` for manual configuration.",
+				MarkdownDescription: "WireGuard VPN configuration. Specify either `configuration` for a single-peer file or `peer` for explicit settings.",
 				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"private_key": schema.StringAttribute{
@@ -303,13 +303,14 @@ func (r *vpnClientResource) Schema(
 						},
 					},
 					"configuration": schema.SingleNestedAttribute{
-						MarkdownDescription: "File-based WireGuard configuration. Provide a complete WireGuard .conf file.",
+						MarkdownDescription: "Single-peer WireGuard configuration translated to UniFi manual client settings. The manual client API cannot enforce AllowedIPs from a file. A file containing AllowedIPs requires a different management method for those selectors.",
 						Optional:            true,
 						Attributes: map[string]schema.Attribute{
 							"content": schema.StringAttribute{
 								MarkdownDescription: "Base64-encoded WireGuard configuration file content.",
 								Required:            true,
 								Sensitive:           true,
+								Validators:          []validator.String{wireguardFileValidator{}},
 							},
 							"filename": schema.StringAttribute{
 								MarkdownDescription: "Filename of the WireGuard configuration file.",
@@ -560,6 +561,11 @@ func (r *vpnClientResource) Read(
 		}
 	}
 
+	if err := vpnClientNetwork.validate(network); err != nil {
+		resp.Diagnostics.AddError("Unexpected Network Type", err.Error())
+		return
+	}
+
 	// Convert to model
 	var priorState vpnClientResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &priorState)...)
@@ -626,6 +632,11 @@ func (r *vpnClientResource) Update(
 	network.ID = data.ID.ValueString()
 
 	// Update the network
+	if err := r.client.checkNetworkKind(ctx, site, network.ID, vpnClientNetwork); err != nil {
+		resp.Diagnostics.AddError("Cannot Verify Network Type Before Update", err.Error())
+		return
+	}
+
 	updatedNetwork, err := r.client.UpdateNetwork(ctx, site, network)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -685,7 +696,7 @@ func (r *vpnClientResource) Delete(
 
 	// Delete the network
 	name := data.Name.ValueString()
-	err := r.client.DeleteNetwork(ctx, site, data.ID.ValueString(), name)
+	err := r.client.deleteManagedNetwork(ctx, site, data.ID.ValueString(), name, vpnClientNetwork)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting VPN Client",
@@ -819,7 +830,7 @@ func (r *vpnClientResource) modelToNetwork(
 				d := wireguard.Configuration.As(ctx, &config, basetypes.ObjectAsOptions{})
 				diags.Append(d...)
 				if !diags.HasError() {
-					parsed, err := parseWireGuardBase64Config(config.Content.ValueString())
+					parsed, err := parseUniFiWireGuardFile(config.Content.ValueString())
 					if err != nil {
 						diags.AddError(
 							"Invalid WireGuard Configuration File",
@@ -1144,7 +1155,7 @@ func (r *vpnClientResource) List(
 	stream.Results = func(push func(list.ListResult) bool) {
 		for _, network := range networks {
 			// Filter by purpose: only vpn-client networks.
-			if network.Purpose != unifi.PurposeVPNClient {
+			if !vpnClientNetwork.matches(&network) {
 				continue
 			}
 
