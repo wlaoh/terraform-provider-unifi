@@ -43,7 +43,7 @@ jobs:
           echo "go=true" >> "$GITHUB_OUTPUT"
           exit 0
         fi
-        ci_paths='(\.go$)|(^go\.mod$)|(^go\.sum$)|(^\.github/workflows/ci\.yaml$)'
+        ci_paths='(\.go$)|((^|/)go\.mod$)|((^|/)go\.sum$)|(^\.github/workflows/ci\.yaml$)'
         # A rename counts under both names. A here-string, not `printf | grep -q`:
         # under pipefail the writer's SIGPIPE would read as no match.
         files="$(gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/files" \
@@ -123,6 +123,10 @@ jobs:
       with:
         go-version-file: "go.mod"
         cache: true
+    - name: Test the bundled controller SDK
+      working-directory: third_party/go-unifi
+      run: go test -race ./...
+
     - run: go mod download
 
     - name: Unit tests

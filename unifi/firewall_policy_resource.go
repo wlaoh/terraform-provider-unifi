@@ -710,13 +710,8 @@ func (r *firewallPolicyResource) Schema(
 				},
 			},
 			"index": schema.Int64Attribute{
-				MarkdownDescription: "The ordering index of the policy within its zone-pair, " +
-					"assigned by the controller. **Read-only:** UniFi does not accept a " +
-					"client-supplied index on create or update (the policy is always appended " +
-					"to the end of its source/destination zone-pair), and the supported API " +
-					"exposes no reorder operation, so policy ordering cannot be managed through " +
-					"this provider. Reorder policies in the UniFi UI if needed.",
-				Computed: true,
+				MarkdownDescription: "Read-only index within the zone pair. Manage policy ordering separately with `unifi_firewall_policy_ordering` and the Integration API UUIDs.",
+				Computed:            true,
 			},
 			"create_allow_respond": schema.BoolAttribute{
 				MarkdownDescription: "When `true`, UniFi automatically creates a matching rule to allow " +
@@ -769,21 +764,24 @@ func (r *firewallPolicyResource) Schema(
 				},
 			},
 			"icmp": schema.SingleNestedAttribute{
-				MarkdownDescription: "ICMP type matching modes. Managed by the UniFi controller; the provider round-trips them so updates are accepted.",
+				MarkdownDescription: "ICMP type selectors as reported by the controller. Omit to preserve its current values.",
+				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Object{
 					objectplanmodifier.UseStateForUnknown(),
 				},
 				Attributes: map[string]schema.Attribute{
 					"typename": schema.StringAttribute{
-						MarkdownDescription: "ICMP type matching mode. Managed by the UniFi controller; the provider round-trips it so updates are accepted.",
+						MarkdownDescription: "IPv4 ICMP type name for this controller. For an existing policy, inspect the imported value before recreating it.",
+						Optional:            true,
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
 					},
 					"v6_typename": schema.StringAttribute{
-						MarkdownDescription: "ICMPv6 type matching mode. Managed by the UniFi controller; the provider round-trips it so updates are accepted.",
+						MarkdownDescription: "IPv6 ICMP type name for this controller.",
+						Optional:            true,
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
@@ -1415,7 +1413,7 @@ func modelToFirewallPolicy(
 
 	// index is controller-assigned and read-only: UniFi ignores a client-supplied
 	// value on create/update (the policy is appended to the end of its zone-pair) and
-	// the supported API exposes no reorder operation, so we never send it (#348).
+	// individual policy updates do not support reordering (#348).
 
 	var srcModel firewallPolicyEndpointModel
 	diags.Append(model.Source.As(ctx, &srcModel, basetypes.ObjectAsOptions{})...)

@@ -358,6 +358,7 @@ func (p *unifiProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewDynamicDNSResource,
 		NewFirewallGroupFrameworkResource,
 		NewFirewallPolicyResource,
+		NewFirewallPolicyOrderingResource,
 		NewFirewallRuleResource,
 		NewFirewallZoneResource,
 		NewNatResource,
