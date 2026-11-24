@@ -635,7 +635,6 @@ Required:
 - `enabled` (Boolean) Enable Teleport remote-access VPN.
 
 
-
 <a id="nestedatt--timeouts"></a>
 ### Nested Schema for `timeouts`
 
