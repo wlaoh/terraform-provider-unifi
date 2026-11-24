@@ -1,14 +1,14 @@
 # Unifi Terraform Provider (terraform-provider-unifi)
 
-[![Acceptance Tests](https://github.com/ubiquiti-community/terraform-provider-unifi/actions/workflows/acctest.yaml/badge.svg)](https://github.com/ubiquiti-community/terraform-provider-unifi/actions/workflows/acctest.yaml) [![codecov](https://codecov.io/github/ubiquiti-community/terraform-provider-unifi/graph/badge.svg?token=KVP7FS41IG)](https://codecov.io/github/ubiquiti-community/terraform-provider-unifi)
+[![Fork acceptance tests](https://github.com/wlaoh/terraform-provider-unifi/actions/workflows/acctest.yaml/badge.svg)](https://github.com/wlaoh/terraform-provider-unifi/actions/workflows/acctest.yaml)
 
 > **Note**: You can't (for obvious reasons) configure your network while connected to something that may disconnect (like the WiFi). Use a hard-wired connection to your controller to use this provider.
 
-Functionality first needs to be added to the [go-unifi](https://github.com/ubiquiti-community/go-unifi) SDK.
+This fork builds with a local copy of the `go-unifi` SDK. Its [provenance and update instructions](third_party/go-unifi/README.md) describe how to keep the provider's controller changes when updating the SDK.
 
 ## Documentation
 
-You can browse documentation on the [Terraform provider registry](https://registry.terraform.io/providers/ubiquiti-community/unifi/latest/docs).
+Use the [documentation in this checkout](docs/index.md) for the fork's [resources](docs/resources) and [data sources](docs/data-sources). The Terraform Registry documents the [published upstream provider](https://registry.terraform.io/providers/ubiquiti-community/unifi/latest/docs).
 
 ## Supported Unifi Controller Versions
 
