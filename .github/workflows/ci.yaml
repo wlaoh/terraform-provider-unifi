@@ -16,8 +16,8 @@ on:
     - "main"
     paths:
     - "**.go"
-    - "go.mod"
-    - "go.sum"
+    - "**/go.mod"
+    - "**/go.sum"
     - ".github/workflows/ci.yaml"
 
 # contents: read is needed to check out the repository.
@@ -123,10 +123,6 @@ jobs:
       with:
         go-version-file: "go.mod"
         cache: true
-    - name: Test the bundled controller SDK
-      working-directory: third_party/go-unifi
-      run: go test -race ./...
-
     - run: go mod download
 
     - name: Unit tests

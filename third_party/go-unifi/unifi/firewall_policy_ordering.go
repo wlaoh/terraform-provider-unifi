@@ -25,6 +25,9 @@ func (c *ApiClient) SetFirewallPolicyOrder(ctx context.Context, site Integration
 }
 
 func (c *ApiClient) firewallPolicyOrder(ctx context.Context, method string, site IntegrationSiteID, source, destination string, body any) (*FirewallPolicyOrder, error) {
+	if c.apiKey == "" {
+		return nil, fmt.Errorf("firewall ordering requires Integration API key authentication")
+	}
 	if !integrationUUIDPattern.MatchString(string(site)) || !integrationUUIDPattern.MatchString(source) || !integrationUUIDPattern.MatchString(destination) {
 		return nil, fmt.Errorf("firewall ordering requires Integration API site and zone UUIDs")
 	}

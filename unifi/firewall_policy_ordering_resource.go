@@ -42,10 +42,17 @@ func (r *firewallPolicyOrderingResource) Metadata(_ context.Context, req resourc
 func (r *firewallPolicyOrderingResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	uuid := stringvalidator.RegexMatches(orderingUUID, "must be a lowercase Integration API UUID")
 	scope := func(desc string) schema.StringAttribute {
-		return schema.StringAttribute{Required: true, MarkdownDescription: desc, Validators: []validator.String{uuid}, PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()}}
+		return schema.StringAttribute{
+			Required: true, MarkdownDescription: desc,
+			Validators:    []validator.String{uuid},
+			PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
+		}
 	}
 	sequence := func(desc string) schema.ListAttribute {
-		return schema.ListAttribute{Required: true, ElementType: types.StringType, MarkdownDescription: desc, Validators: []validator.List{listvalidator.UniqueValues(), listvalidator.ValueStringsAre(uuid)}}
+		return schema.ListAttribute{
+			Required: true, ElementType: types.StringType, MarkdownDescription: desc,
+			Validators: []validator.List{listvalidator.UniqueValues(), listvalidator.ValueStringsAre(uuid)},
+		}
 	}
 	resp.Schema = schema.Schema{MarkdownDescription: "Manage the complete order of user-defined firewall policies for one source/destination zone pair using the Integration API and an API key. Import the existing order first. Use Integration API UUIDs for policies and zones; legacy controller IDs from the firewall policy resource use a different namespace. Supply every current user policy exactly once across the two lists. Removing this resource releases ownership and leaves the controller order in place.", Attributes: map[string]schema.Attribute{
 		"site_id":                          scope("Integration API site UUID."),
@@ -120,6 +127,8 @@ func (r *firewallPolicyOrderingResource) apply(ctx context.Context, plan tfsdk.P
 	}
 	if !ordersEqual(*current, want) {
 		result, err := r.client.SetFirewallPolicyOrder(ctx, site, src, dst, want)
+		// Ordering uses Integration UUIDs; cached policy lists use legacy site names.
+		r.client.firewallPolicies.Clear()
 		if err != nil {
 			diags.AddError("Could not update firewall policy order", err.Error())
 			return
