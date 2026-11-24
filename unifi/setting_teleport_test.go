@@ -14,9 +14,14 @@ import (
 
 func TestSettingTeleportImportAndUpdate(t *testing.T) {
 	ctx := context.Background()
-	r, puts := newSettingsFakeController(t, []map[string]any{{
-		"key": "teleport", "enabled": true, "subnet_cidr": "192.0.2.0/24", "controller_only": "fixture",
-	}})
+	r, puts := newSettingsFakeController(t, []map[string]any{
+		{
+			"key":             "teleport",
+			"enabled":         true,
+			"subnet_cidr":     "192.0.2.0/24",
+			"controller_only": "fixture",
+		},
+	})
 	s := resourceSchema(t, r)
 	resp := importSettings(ctx, t, r, true)
 	if resp.Diagnostics.HasError() {
@@ -26,7 +31,8 @@ func TestSettingTeleportImportAndUpdate(t *testing.T) {
 	if d := resp.State.GetAttribute(ctx, path.Root("teleport"), &section); d.HasError() {
 		t.Fatal(d)
 	}
-	if len(section.Attributes()) != 1 || !types.BoolValue(true).Equal(section.Attributes()["enabled"]) {
+	if len(section.Attributes()) != 1 ||
+		!types.BoolValue(true).Equal(section.Attributes()["enabled"]) {
 		t.Fatalf("imported teleport = %v", section)
 	}
 
@@ -39,9 +45,21 @@ func TestSettingTeleportImportAndUpdate(t *testing.T) {
 		t.Fatalf("reads and planning wrote %v", got)
 	}
 
-	attrs := map[string]any{"id": "default", "site": "default", "teleport": map[string]any{"enabled": false}}
+	attrs := map[string]any{
+		"id":       "default",
+		"site":     "default",
+		"teleport": map[string]any{"enabled": false},
+	}
 	update := &fwresource.UpdateResponse{State: resp.State, Identity: resp.Identity}
-	r.Update(ctx, fwresource.UpdateRequest{State: resp.State, Plan: tfPlan(t, s, attrs), Config: tfConfig(t, s, attrs)}, update)
+	r.Update(
+		ctx,
+		fwresource.UpdateRequest{
+			State:  resp.State,
+			Plan:   tfPlan(t, s, attrs),
+			Config: tfConfig(t, s, attrs),
+		},
+		update,
+	)
 	if update.Diagnostics.HasError() {
 		t.Fatal(update.Diagnostics)
 	}
@@ -50,7 +68,8 @@ func TestSettingTeleportImportAndUpdate(t *testing.T) {
 		t.Fatalf("PUT = %v, want %v", got, want)
 	}
 	stored, err := r.storedSetting(ctx, "default", "teleport")
-	if err != nil || stored["subnet_cidr"] != "192.0.2.0/24" || stored["controller_only"] != "fixture" {
+	if err != nil || stored["subnet_cidr"] != "192.0.2.0/24" ||
+		stored["controller_only"] != "fixture" {
 		t.Fatalf("update lost controller fields: %v", err)
 	}
 
@@ -62,7 +81,12 @@ func TestSettingTeleportImportAndUpdate(t *testing.T) {
 		t.Fatal(read.Diagnostics)
 	}
 	var enabled types.Bool
-	if d := read.State.GetAttribute(ctx, path.Root("teleport").AtName("enabled"), &enabled); d.HasError() || !enabled.ValueBool() {
+	if d := read.State.GetAttribute(
+		ctx,
+		path.Root("teleport").AtName("enabled"),
+		&enabled,
+	); d.HasError() ||
+		!enabled.ValueBool() {
 		t.Fatalf("refresh missed externally enabled Teleport: %v", d)
 	}
 	if got := puts(); len(got) != 0 {
@@ -78,7 +102,12 @@ func TestSettingTeleportAbsentOrOlderState(t *testing.T) {
 		t.Fatal(resp.Diagnostics)
 	}
 	var section types.Object
-	if d := resp.State.GetAttribute(ctx, path.Root("teleport"), &section); d.HasError() || !section.IsNull() {
+	if d := resp.State.GetAttribute(
+		ctx,
+		path.Root("teleport"),
+		&section,
+	); d.HasError() ||
+		!section.IsNull() {
 		t.Fatalf("absent Teleport document produced %v (%v)", section, d)
 	}
 	s := resp.State.Schema
@@ -93,7 +122,12 @@ func TestSettingTeleportAbsentOrOlderState(t *testing.T) {
 	if read.Diagnostics.HasError() {
 		t.Fatal(read.Diagnostics)
 	}
-	if d := read.State.GetAttribute(ctx, path.Root("teleport"), &section); d.HasError() || !section.IsNull() {
+	if d := read.State.GetAttribute(
+		ctx,
+		path.Root("teleport"),
+		&section,
+	); d.HasError() ||
+		!section.IsNull() {
 		t.Fatalf("old state acquired Teleport settings: %v (%v)", section, d)
 	}
 	if got := puts(); len(got) != 0 {

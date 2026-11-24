@@ -44,9 +44,12 @@ func (r *settingResource) persistTeleport(
 	if diags.HasError() || !isKnown(section) {
 		return
 	}
-	enabled := section.Attributes()["enabled"].(types.Bool)
-	if !isKnown(enabled) {
-		diags.AddError("Unknown Teleport setting", "teleport.enabled must be known when applying the configuration.")
+	enabled, ok := section.Attributes()["enabled"].(types.Bool)
+	if !ok || !isKnown(enabled) {
+		diags.AddError(
+			"Unknown Teleport setting",
+			"teleport.enabled must be known when applying the configuration.",
+		)
 		return
 	}
 
