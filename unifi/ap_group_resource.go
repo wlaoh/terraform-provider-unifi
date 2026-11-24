@@ -654,14 +654,15 @@ func (r *apGroupResource) List(
 				Site: types.StringValue(site),
 			})...)
 
-			// Convert to model.
-			var model apGroupResourceModel
-			result.Diagnostics.Append(
-				r.apGroupToModel(ctx, &group, &model, site)...,
-			)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model apGroupResourceModel
+				result.Diagnostics.Append(
+					r.apGroupToModel(ctx, &group, &model, site)...,
+				)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

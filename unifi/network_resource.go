@@ -3340,13 +3340,14 @@ func (r *networkResource) List(
 				})...,
 			)
 
-			// Convert to model.
-			var model networkResourceModel
-			result.Diagnostics.Append(
-				r.networkToModel(ctx, &network, &model, site, &networkResourceModel{})...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model networkResourceModel
+				result.Diagnostics.Append(
+					r.networkToModel(ctx, &network, &model, site, &networkResourceModel{})...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

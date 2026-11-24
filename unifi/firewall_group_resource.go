@@ -695,14 +695,15 @@ func (r *firewallGroupResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			var model firewallGroupResourceModel
-			result.Diagnostics.Append(
-				r.firewallGroupToModel(ctx, &group, &model, site)...,
-			)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model firewallGroupResourceModel
+				result.Diagnostics.Append(
+					r.firewallGroupToModel(ctx, &group, &model, site)...,
+				)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

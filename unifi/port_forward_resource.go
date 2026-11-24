@@ -1024,13 +1024,14 @@ func (r *portForwardResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			var model portForwardResourceModel
-			pfCopy := portForward
-			result.Diagnostics.Append(r.portForwardToModel(ctx, &pfCopy, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model portForwardResourceModel
+				pfCopy := portForward
+				result.Diagnostics.Append(r.portForwardToModel(ctx, &pfCopy, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

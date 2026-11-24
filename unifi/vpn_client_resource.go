@@ -1168,13 +1168,14 @@ func (r *vpnClientResource) List(
 				})...,
 			)
 
-			// Convert to model.
-			var model vpnClientResourceModel
-			result.Diagnostics.Append(
-				r.networkToModel(ctx, &network, &model, site, &vpnClientResourceModel{})...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model vpnClientResourceModel
+				result.Diagnostics.Append(
+					r.networkToModel(ctx, &network, &model, site, &vpnClientResourceModel{})...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

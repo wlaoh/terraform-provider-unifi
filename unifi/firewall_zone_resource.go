@@ -221,6 +221,7 @@ func (r *firewallZoneResource) Create(
 	}
 
 	created, err := r.client.CreateFirewallZone(ctx, site, zone)
+	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
 		resp.Diagnostics.AddError("Error Creating Firewall Zone", err.Error())
 		return
@@ -335,6 +336,7 @@ func (r *firewallZoneResource) Update(
 	}
 
 	updated, err := r.client.UpdateFirewallZone(ctx, site, zone)
+	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
 		resp.Diagnostics.AddError("Error Updating Firewall Zone", err.Error())
 		return
@@ -387,6 +389,7 @@ func (r *firewallZoneResource) Delete(
 	}
 
 	err := r.client.DeleteFirewallZone(ctx, site, data.ID.ValueString())
+	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
 		resp.Diagnostics.AddError("Error Deleting Firewall Zone", err.Error())
 		return
@@ -622,13 +625,14 @@ func (r *firewallZoneResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			var model firewallZoneResourceModel
-			zoneCopy := zone
-			result.Diagnostics.Append(r.firewallZoneToModel(ctx, &zoneCopy, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model firewallZoneResourceModel
+				zoneCopy := zone
+				result.Diagnostics.Append(r.firewallZoneToModel(ctx, &zoneCopy, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

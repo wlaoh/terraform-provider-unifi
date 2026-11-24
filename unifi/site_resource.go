@@ -602,12 +602,13 @@ func (r *siteFrameworkResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			var model siteFrameworkResourceModel
-			result.Diagnostics.Append(r.siteToModel(ctx, &site, &model)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model siteFrameworkResourceModel
+				result.Diagnostics.Append(r.siteToModel(ctx, &site, &model)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

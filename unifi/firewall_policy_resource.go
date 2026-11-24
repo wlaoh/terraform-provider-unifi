@@ -960,6 +960,7 @@ func (r *firewallPolicyResource) Create(
 	}
 
 	created, err := r.client.CreateFirewallPolicy(ctx, site, fp)
+	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Creating Firewall Policy",
@@ -1023,7 +1024,7 @@ func (r *firewallPolicyResource) Read(
 		site = r.client.Site
 	}
 
-	fp, err := r.client.GetFirewallPolicy(ctx, site, id)
+	fp, err := r.client.readFirewallPolicy(ctx, site, id)
 	if err != nil {
 		if _, ok := err.(*unifi.NotFoundError); ok {
 			removeResourceOnRead(ctx, resp, identity)
@@ -1096,6 +1097,7 @@ func (r *firewallPolicyResource) Update(
 	plannedDstMTT := endpointMatchingTargetType(ctx, plan.Destination, &resp.Diagnostics)
 
 	updated, err := r.client.UpdateFirewallPolicy(ctx, site, fp)
+	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Firewall Policy",
@@ -1167,6 +1169,7 @@ func (r *firewallPolicyResource) Delete(
 	}
 
 	err := r.client.DeleteFirewallPolicy(ctx, site, state.ID.ValueString())
+	r.client.invalidateFirewallPolicies(site)
 	if err != nil {
 		if _, ok := err.(*unifi.NotFoundError); !ok {
 			resp.Diagnostics.AddError(
@@ -1835,6 +1838,7 @@ func (r *firewallPolicyResource) ListResourceConfigSchema(
 					Attributes: map[string]listschema.Attribute{
 						"name": listschema.StringAttribute{
 							MarkdownDescription: "The name of the filter to apply. Supported values are: `name`, `action`, `enabled`.",
+							Validators:          []validator.String{stringvalidator.OneOf("name", "action", "enabled")},
 							Required:            true,
 						},
 						"value": listschema.StringAttribute{
@@ -1870,7 +1874,11 @@ func (r *firewallPolicyResource) List(
 	// Process filter blocks.
 	var filters []firewallPolicyListFilterModel
 	if !config.Filter.IsNull() && !config.Filter.IsUnknown() {
-		config.Filter.ElementsAs(ctx, &filters, false)
+		diags.Append(config.Filter.ElementsAs(ctx, &filters, false)...)
+		if diags.HasError() {
+			stream.Results = list.ListResultsStreamDiagnostics(diags)
+			return
+		}
 	}
 
 	postFilters := make(map[string]string)
@@ -1938,13 +1946,14 @@ func (r *firewallPolicyResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			p := policy
-			var model firewallPolicyModel
-			result.Diagnostics.Append(r.firewallPolicyListToModel(ctx, &p, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				p := policy
+				var model firewallPolicyModel
+				result.Diagnostics.Append(r.firewallPolicyListToModel(ctx, &p, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

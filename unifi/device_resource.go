@@ -4462,13 +4462,14 @@ func (r *deviceResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			d := device
-			var model deviceResourceModel
-			result.Diagnostics.Append(r.deviceListToModel(ctx, &d, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				d := device
+				var model deviceResourceModel
+				result.Diagnostics.Append(r.deviceListToModel(ctx, &d, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

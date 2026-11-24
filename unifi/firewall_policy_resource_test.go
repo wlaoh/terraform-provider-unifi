@@ -8,9 +8,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	fwlist "github.com/hashicorp/terraform-plugin-framework/list"
+	listschema "github.com/hashicorp/terraform-plugin-framework/list/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	fwresource "github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -1619,6 +1621,23 @@ func Test_firewallPolicyResource_ListResourceConfigSchema(t *testing.T) {
 				t.Error("ListResourceConfigSchema missing 'site' attribute")
 			}
 		})
+	}
+}
+
+func TestFirewallPolicyListFilterNames(t *testing.T) {
+	var response fwlist.ListResourceSchemaResponse
+	r := &firewallPolicyResource{}
+	r.ListResourceConfigSchema(t.Context(), fwlist.ListResourceSchemaRequest{}, &response)
+	filter := response.Schema.Blocks["filter"].(listschema.ListNestedBlock)
+	name := filter.NestedObject.Attributes["name"].(listschema.StringAttribute)
+	for _, key := range []string{"name", "enabled", "action", "naem"} {
+		var validation validator.StringResponse
+		for _, v := range name.Validators {
+			v.ValidateString(t.Context(), validator.StringRequest{ConfigValue: types.StringValue(key)}, &validation)
+		}
+		if validation.Diagnostics.HasError() != (key == "naem") {
+			t.Errorf("filter name %q produced diagnostics %v", key, validation.Diagnostics)
+		}
 	}
 }
 

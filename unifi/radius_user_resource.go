@@ -899,11 +899,12 @@ func (r *radiusUserResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			var model radiusUserResourceModel
-			result.Diagnostics.Append(r.radiusUserToModel(ctx, &account, &model, site)...)
-			model.Timeouts = timeoutsNullValue()
-			result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model radiusUserResourceModel
+				result.Diagnostics.Append(r.radiusUserToModel(ctx, &account, &model, site)...)
+				model.Timeouts = timeoutsNullValue()
+				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			}
 
 			if !push(result) {
 				return

@@ -1166,12 +1166,13 @@ func (r *trafficRouteResource) List(
 				})...,
 			)
 
-			// Convert to model.
-			var model trafficRouteResourceModel
-			result.Diagnostics.Append(r.apiToModel(ctx, &route, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model trafficRouteResourceModel
+				result.Diagnostics.Append(r.apiToModel(ctx, &route, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

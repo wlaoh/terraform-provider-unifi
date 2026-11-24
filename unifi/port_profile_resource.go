@@ -1691,14 +1691,15 @@ func (r *portProfileResource) List(
 				Site: types.StringValue(site),
 			})...)
 
-			// Convert to model.
-			var model portProfileResourceModel
-			result.Diagnostics.Append(
-				r.portProfileToModel(ctx, &profile, &model, site)...,
-			)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model portProfileResourceModel
+				result.Diagnostics.Append(
+					r.portProfileToModel(ctx, &profile, &model, site)...,
+				)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

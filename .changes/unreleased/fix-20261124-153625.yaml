@@ -1,0 +1,3 @@
+kind: fix
+body: 'Share firewall policy collection reads across a site during bulk import and refresh, reject unknown firewall policy filters, and skip full resource conversion for identity-only discovery.'
+time: 2026-11-24T15:36:25Z

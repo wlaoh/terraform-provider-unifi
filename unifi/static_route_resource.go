@@ -977,13 +977,14 @@ func (r *staticRouteFrameworkResource) List(
 				})...,
 			)
 
-			// Convert to model.
-			var model staticRouteFrameworkResourceModel
-			routingCopy := routing
-			result.Diagnostics.Append(r.routingToModel(ctx, &routingCopy, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model staticRouteFrameworkResourceModel
+				routingCopy := routing
+				result.Diagnostics.Append(r.routingToModel(ctx, &routingCopy, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

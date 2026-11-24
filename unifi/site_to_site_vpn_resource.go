@@ -1329,12 +1329,13 @@ func (r *siteToSiteVPNResource) List(
 				})...,
 			)
 
-			// Convert to model.
-			var model siteToSiteVPNResourceModel
-			result.Diagnostics.Append(r.networkToModel(ctx, &network, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model siteToSiteVPNResourceModel
+				result.Diagnostics.Append(r.networkToModel(ctx, &network, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

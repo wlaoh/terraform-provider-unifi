@@ -738,11 +738,13 @@ func (r *trafficMatchingListResource) List(
 				result.Identity.SetAttribute(ctx, path.Root("site"), types.StringValue(site))...,
 			)
 
-			var model trafficMatchingListResourceModel
-			result.Diagnostics.Append(r.apiToModel(ctx, &apiList, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model trafficMatchingListResourceModel
+				result.Diagnostics.Append(r.apiToModel(ctx, &apiList, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

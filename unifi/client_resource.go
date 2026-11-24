@@ -1612,12 +1612,13 @@ func (r *clientResource) List(
 					types.StringValue(client.MAC),
 				)...)
 
-			// Convert client to resource model and set the resource data.
-			var model clientResourceModel
-			result.Diagnostics.Append(r.clientToModel(ctx, &client, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model clientResourceModel
+				result.Diagnostics.Append(r.clientToModel(ctx, &client, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			// Send the result to the stream.

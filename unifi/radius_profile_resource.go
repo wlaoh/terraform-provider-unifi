@@ -1037,11 +1037,12 @@ func (r *radiusProfileResource) List(
 				)...,
 			)
 
-			// Convert to model.
-			var model radiusProfileResourceModel
-			result.Diagnostics.Append(r.radiusProfileToModel(ctx, &profile, &model, site)...)
-			model.Timeouts = timeoutsNullValue()
-			result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model radiusProfileResourceModel
+				result.Diagnostics.Append(r.radiusProfileToModel(ctx, &profile, &model, site)...)
+				model.Timeouts = timeoutsNullValue()
+				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			}
 
 			if !push(result) {
 				return

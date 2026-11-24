@@ -51,6 +51,9 @@ type Client struct {
 	groupCacheMu sync.Mutex
 	groupCache   map[string]map[string]string // site -> (name -> id)
 
+	// firewallPolicies holds brief, per-site snapshots shared across parallel policy reads.
+	firewallPolicies sync.Map // site -> *firewallPolicySnapshot
+
 	// integrationSiteMu guards integrationSites, which memoizes site -> Integration
 	// API UUID so the sites listing is fetched once per site, not on every CRUD call.
 	integrationSiteMu sync.Mutex

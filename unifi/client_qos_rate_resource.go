@@ -774,14 +774,16 @@ func (r *clientQosRateResource) List(
 				Site: types.StringValue(site),
 			})...)
 
-			// Convert to model. Pre-populate the identifier so the converter's
-			// ID/Name guard is satisfied.
-			var model clientQosRateResourceModel
-			model.ID = types.StringValue(clientGroup.ID)
-			result.Diagnostics.Append(r.clientQosRateToModel(ctx, &clientGroup, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				// Convert to model. Pre-populate the identifier so the converter's
+				// ID/Name guard is satisfied.
+				var model clientQosRateResourceModel
+				model.ID = types.StringValue(clientGroup.ID)
+				result.Diagnostics.Append(r.clientQosRateToModel(ctx, &clientGroup, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {

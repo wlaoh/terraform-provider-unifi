@@ -756,12 +756,13 @@ func (r *powerSupervisorResource) List(
 				Site: types.StringValue(site),
 			})...)
 
-			// Convert to model.
-			var model powerSupervisorResourceModel
-			result.Diagnostics.Append(r.powerSupervisorToModel(&supervisor, &model, site)...)
-			if !result.Diagnostics.HasError() {
-				model.Timeouts = timeoutsNullValue()
-				result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+			if req.IncludeResource {
+				var model powerSupervisorResourceModel
+				result.Diagnostics.Append(r.powerSupervisorToModel(&supervisor, &model, site)...)
+				if !result.Diagnostics.HasError() {
+					model.Timeouts = timeoutsNullValue()
+					result.Diagnostics.Append(result.Resource.Set(ctx, model)...)
+				}
 			}
 
 			if !push(result) {
